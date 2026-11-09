@@ -12,8 +12,12 @@ export function ServicesPage() {
   usePageTitle(`${t.nav.services} · Motion`);
 
   return (
-    <div className="bg-black text-white">
-      <header className="shell py-14 md:py-20">
+    <div className="relative bg-black text-white">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -left-20 top-24 h-80 w-80 rounded-full bg-motion-green/30 blur-3xl"
+      />
+      <header className="shell relative py-14 md:py-20">
         <SectionLabel index="01">{t.services.label}</SectionLabel>
         <h1 className="mt-4 max-w-4xl text-[clamp(2.4rem,6vw,5rem)] font-bold leading-[0.95]">
           {t.services.title}
@@ -22,7 +26,7 @@ export function ServicesPage() {
           {t.services.lead}
         </p>
       </header>
-      <div className="shell pb-20 md:pb-28">
+      <div className="shell relative pb-20 md:pb-28">
         <ServiceGrid items={t.services.items} detailed />
       </div>
     </div>

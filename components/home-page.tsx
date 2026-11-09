@@ -112,22 +112,30 @@ export function HomePage() {
         </div>
       </section>
 
-      <section className="bg-black pb-20 text-white md:pb-28">
-        <div className="shell">
-          <Reveal className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <section className="relative overflow-hidden bg-black pb-20 text-white md:pb-28">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-24 top-10 h-72 w-72 rounded-full bg-motion-lime/10 blur-3xl"
+        />
+        <div className="shell relative">
+          <Reveal className="mb-10 flex flex-col gap-5 sm:mb-12 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <SectionLabel index={t.services.index}>
                 {t.services.label}
               </SectionLabel>
-              <h2 className="mt-4 max-w-xl text-[clamp(2rem,4vw,3.4rem)] font-bold leading-[0.98]">
+              <h2 className="mt-4 max-w-2xl text-[clamp(2rem,4vw,3.6rem)] font-bold leading-[0.98]">
                 {t.services.title}
               </h2>
+              <p className="mt-4 max-w-xl text-base leading-relaxed text-white/60">
+                {t.services.lead}
+              </p>
             </div>
             <Link
               href="/services"
-              className="text-sm font-medium text-motion-lime underline-offset-4 hover:underline"
+              className="inline-flex items-center gap-2 rounded-full border border-motion-lime/50 px-5 py-2.5 text-sm font-medium text-motion-lime transition-colors hover:bg-motion-lime hover:text-black"
             >
               {t.cta.services}
+              <span aria-hidden>→</span>
             </Link>
           </Reveal>
           <ServiceGrid items={t.services.items} />
