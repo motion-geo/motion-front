@@ -77,29 +77,31 @@ export function TermsPage() {
   usePageTitle(`${t.nav.terms} · Motion`);
 
   return (
-    <article className="bg-panel text-panel-fg">
-      <header className="shell py-14 md:py-20">
-        <SectionLabel tone="brand">{t.terms.label}</SectionLabel>
-        <h1 className="mt-4 max-w-3xl text-[clamp(2.4rem,6vw,4.6rem)] font-bold leading-[0.95]">
-          {t.terms.title}
-        </h1>
-        <p className="mt-6 inline-flex rounded-full bg-accent px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-accent-fg">
-          {t.terms.draft}
-        </p>
-        <p className="mt-6 max-w-2xl text-lg leading-relaxed text-panel-fg/75">
-          {t.terms.lead}
-        </p>
-      </header>
-      <ol className="shell max-w-3xl space-y-10 pb-20 md:pb-28">
-        {t.terms.sections.map((section) => (
-          <li key={section.title} className="border-t border-line pt-8">
-            <h2 className="text-2xl font-bold">{section.title}</h2>
-            <p className="mt-3 text-base leading-relaxed text-panel-fg/80">
-              {section.body}
-            </p>
-          </li>
-        ))}
-      </ol>
+    <article className="bg-page text-page-fg">
+      <div className="shell max-w-3xl py-14 md:py-20">
+        <header>
+          <SectionLabel tone="brand">{t.terms.label}</SectionLabel>
+          <h1 className="mt-4 text-[clamp(2.4rem,6vw,4.6rem)] font-bold leading-[0.95]">
+            {t.terms.title}
+          </h1>
+          <p className="mt-6 inline-flex rounded-full bg-accent px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-accent-fg">
+            {t.terms.draft}
+          </p>
+          <p className="mt-6 text-lg leading-relaxed text-fg-muted">
+            {t.terms.lead}
+          </p>
+        </header>
+        <ol className="mt-12 space-y-10 pb-8 md:pb-16">
+          {t.terms.sections.map((section) => (
+            <li key={section.title} className="border-t border-line pt-8">
+              <h2 className="text-2xl font-bold">{section.title}</h2>
+              <p className="mt-3 text-base leading-relaxed text-fg-muted">
+                {section.body}
+              </p>
+            </li>
+          ))}
+        </ol>
+      </div>
     </article>
   );
 }

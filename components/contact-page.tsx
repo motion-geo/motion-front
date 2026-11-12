@@ -43,7 +43,7 @@ export function ContactPage() {
           <p className="mt-6 max-w-md text-lg leading-relaxed text-fg-muted">
             {t.contact.lead}
           </p>
-          <p className="mt-6 max-w-md rounded-2xl border border-accent/40 px-4 py-4 text-sm leading-relaxed text-accent">
+          <p className="mt-6 max-w-md border-l-2 border-accent pl-4 text-sm leading-relaxed text-fg-muted">
             {t.contact.note}
           </p>
         </header>
@@ -68,9 +68,9 @@ export function ContactPage() {
           <form
             onSubmit={onSubmit}
             noValidate
-            className="rounded-[1.8rem] bg-card p-6 text-card-fg sm:p-8"
+            className="rounded-[1.8rem] border border-line bg-soft p-6 sm:p-8"
           >
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-5 sm:grid-cols-2">
               <Field
                 label={t.contact.name}
                 name="name"
@@ -91,22 +91,24 @@ export function ContactPage() {
                 autoComplete="email"
               />
             </div>
-            <label className="mt-4 block text-sm font-medium">
-              {t.contact.message}
+            <label className="mt-5 block">
+              <span className="text-xs font-bold uppercase tracking-[0.14em] text-fg-muted">
+                {t.contact.message}
+              </span>
               <textarea
                 name="message"
                 rows={5}
-                className="mt-2 w-full resize-y rounded-2xl border border-line bg-card px-4 py-3 text-base outline-none focus:border-brand"
+                className="mt-2 w-full resize-y rounded-2xl border border-line bg-page px-4 py-3.5 text-base text-page-fg outline-none transition-[border-color,box-shadow] placeholder:text-fg-muted focus:border-accent focus:shadow-[0_0_0_3px_var(--soft)]"
               />
               {errors.message ? (
-                <span className="mt-1 block text-sm text-motion-red">
+                <span className="mt-1.5 block text-sm text-motion-red">
                   {errors.message}
                 </span>
               ) : null}
             </label>
             <button
               type="submit"
-              className="mt-6 rounded-full bg-accent px-6 py-3 text-sm font-medium text-accent-fg"
+              className="mt-7 inline-flex rounded-full bg-accent px-7 py-3.5 text-sm font-medium text-accent-fg transition-transform hover:scale-[1.02]"
             >
               {t.contact.submit}
             </button>
@@ -131,16 +133,18 @@ function Field({
   autoComplete?: string;
 }) {
   return (
-    <label className="block text-sm font-medium">
-      {label}
+    <label className="block">
+      <span className="text-xs font-bold uppercase tracking-[0.14em] text-fg-muted">
+        {label}
+      </span>
       <input
         name={name}
         type={type}
         autoComplete={autoComplete}
-        className="mt-2 w-full rounded-2xl border border-line bg-card px-4 py-3 text-base outline-none focus:border-brand"
+        className="mt-2 w-full rounded-2xl border border-line bg-page px-4 py-3.5 text-base text-page-fg outline-none transition-[border-color,box-shadow] focus:border-accent focus:shadow-[0_0_0_3px_var(--soft)]"
       />
       {error ? (
-        <span className="mt-1 block text-sm text-motion-red">{error}</span>
+        <span className="mt-1.5 block text-sm text-motion-red">{error}</span>
       ) : null}
     </label>
   );
