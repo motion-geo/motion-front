@@ -1,25 +1,20 @@
 export function SectionLabel({
-  index,
   children,
-  tone = "lime",
+  tone = "accent",
 }: {
-  index?: string;
   children: React.ReactNode;
-  tone?: "lime" | "green" | "black";
+  tone?: "accent" | "brand" | "band";
 }) {
   const color =
-    tone === "green"
-      ? "text-motion-green"
-      : tone === "black"
-        ? "text-black"
-        : "text-motion-lime";
+    tone === "brand"
+      ? "text-brand"
+      : tone === "band"
+        ? "text-band-fg"
+        : "text-accent";
 
   return (
-    <div className={`flex items-center gap-3 ${color}`}>
-      {index ? (
-        <span className="font-display text-sm tracking-[0.22em]">{index}</span>
-      ) : null}
-      <span className="text-xs font-bold uppercase tracking-[0.2em]">
+    <div className={color}>
+      <span className="text-sm font-bold uppercase tracking-[0.18em] sm:text-base">
         {children}
       </span>
     </div>

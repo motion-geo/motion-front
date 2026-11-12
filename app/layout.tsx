@@ -3,6 +3,7 @@ import { Alatsi, Noto_Sans_Georgian } from "next/font/google";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import { LocaleProvider } from "@/components/locale";
+import { ThemeProvider, themeInitScript } from "@/components/theme";
 import "./globals.css";
 
 const noto = Noto_Sans_Georgian({
@@ -28,14 +29,21 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="ka"
+      data-theme="noir"
       data-scroll-behavior="smooth"
       className={`${noto.variable} ${alatsi.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
-      <body className="flex min-h-full flex-col bg-black font-sans text-white">
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
+      <body className="flex min-h-full flex-col bg-page font-sans text-page-fg">
         <LocaleProvider>
-          <Header />
-          <main className="flex-1 pt-[4.5rem]">{children}</main>
-          <Footer />
+          <ThemeProvider>
+            <Header />
+            <main className="flex-1 pt-[4.5rem]">{children}</main>
+            <Footer />
+          </ThemeProvider>
         </LocaleProvider>
       </body>
     </html>

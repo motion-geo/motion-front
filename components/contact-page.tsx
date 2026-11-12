@@ -33,23 +33,23 @@ export function ContactPage() {
   }
 
   return (
-    <div className="bg-black text-white">
+    <div className="bg-page text-page-fg">
       <div className="shell grid gap-12 py-14 md:py-20 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
         <header>
-          <SectionLabel index="06">{t.contact.label}</SectionLabel>
+          <SectionLabel>{t.contact.label}</SectionLabel>
           <h1 className="mt-4 text-[clamp(2.4rem,6vw,4.8rem)] font-bold leading-[0.95]">
             {t.contact.title}
           </h1>
-          <p className="mt-6 max-w-md text-lg leading-relaxed text-white/75">
+          <p className="mt-6 max-w-md text-lg leading-relaxed text-fg-muted">
             {t.contact.lead}
           </p>
-          <p className="mt-6 max-w-md rounded-2xl border border-motion-lime/40 px-4 py-4 text-sm leading-relaxed text-motion-lime">
+          <p className="mt-6 max-w-md rounded-2xl border border-accent/40 px-4 py-4 text-sm leading-relaxed text-accent">
             {t.contact.note}
           </p>
         </header>
 
         {sent ? (
-          <div className="rounded-[1.8rem] bg-motion-lime p-8 text-black sm:p-10">
+          <div className="rounded-[1.8rem] bg-accent p-8 text-accent-fg sm:p-10">
             <h2 className="text-3xl font-bold leading-tight sm:text-4xl">
               {t.contact.successTitle}
             </h2>
@@ -58,7 +58,7 @@ export function ContactPage() {
             </p>
             <button
               type="button"
-              className="mt-8 rounded-full bg-black px-5 py-3 text-sm font-medium text-white"
+              className="mt-8 rounded-full bg-page px-5 py-3 text-sm font-medium text-page-fg"
               onClick={() => setSent(false)}
             >
               {t.contact.again}
@@ -68,7 +68,7 @@ export function ContactPage() {
           <form
             onSubmit={onSubmit}
             noValidate
-            className="rounded-[1.8rem] bg-white p-6 text-motion-ink sm:p-8"
+            className="rounded-[1.8rem] bg-card p-6 text-card-fg sm:p-8"
           >
             <div className="grid gap-4 sm:grid-cols-2">
               <Field
@@ -96,7 +96,7 @@ export function ContactPage() {
               <textarea
                 name="message"
                 rows={5}
-                className="mt-2 w-full resize-y rounded-2xl border border-black/15 bg-white px-4 py-3 text-base outline-none focus:border-motion-green"
+                className="mt-2 w-full resize-y rounded-2xl border border-line bg-card px-4 py-3 text-base outline-none focus:border-brand"
               />
               {errors.message ? (
                 <span className="mt-1 block text-sm text-motion-red">
@@ -106,7 +106,7 @@ export function ContactPage() {
             </label>
             <button
               type="submit"
-              className="mt-6 rounded-full bg-motion-lime px-6 py-3 text-sm font-medium text-black"
+              className="mt-6 rounded-full bg-accent px-6 py-3 text-sm font-medium text-accent-fg"
             >
               {t.contact.submit}
             </button>
@@ -137,7 +137,7 @@ function Field({
         name={name}
         type={type}
         autoComplete={autoComplete}
-        className="mt-2 w-full rounded-2xl border border-black/15 bg-white px-4 py-3 text-base outline-none focus:border-motion-green"
+        className="mt-2 w-full rounded-2xl border border-line bg-card px-4 py-3 text-base outline-none focus:border-brand"
       />
       {error ? (
         <span className="mt-1 block text-sm text-motion-red">{error}</span>

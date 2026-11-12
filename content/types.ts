@@ -35,28 +35,25 @@ export type Dictionary = {
     partners: string;
     contact: string;
   };
-  hero: { index: string; title: string; lead: string; tagline: string };
-  who: { index: string; label: string; body: string };
-  mission: { index: string; label: string; body: string };
+  hero: { title: string; lead: string; tagline: string };
+  who: { label: string; body: string };
+  mission: { label: string; body: string };
   vision: { label: string; body: string };
   services: {
-    index: string;
     label: string;
     title: string;
     lead: string;
     items: Service[];
   };
   works: {
-    index: string;
     label: string;
     title: string;
     lead: string;
     all: string;
     items: WorkItem[];
   };
-  reel: { index: string; label: string; title: string; body: string };
+  reel: { label: string; title: string; body: string };
   partners: {
-    index: string;
     label: string;
     title: string;
     lead: string;
@@ -89,4 +86,39 @@ export type Dictionary = {
   ctaBand: { title: string; body: string };
   footer: { rights: string; prototype: string };
   menu: { open: string; close: string; label: string };
+  theme: {
+    label: string;
+    names: {
+      noir: string;
+      day: string;
+      custom: string;
+    };
+    customTitle: string;
+    customHint: string;
+    reset: string;
+    close: string;
+    groups: {
+      surfaces: string;
+      text: string;
+      accents: string;
+    };
+    fields: {
+      page: string;
+      pageFg: string;
+      panel: string;
+      panelFg: string;
+      muted: string;
+      mutedFg: string;
+      band: string;
+      bandFg: string;
+      accent: string;
+      accentFg: string;
+      brand: string;
+      card: string;
+      cardFg: string;
+      line: string;
+      fgMuted: string;
+      icon: string;
+    };
+  };
 };

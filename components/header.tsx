@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { Logo } from "./logo";
 import { useLocale } from "./locale";
+import { ThemeSwitcher } from "./theme";
 
 const links = [
   { href: "/", key: "home" },
@@ -44,17 +45,17 @@ export function Header() {
 
   return (
     <>
-      <header className="fixed inset-x-0 top-0 z-40 border-b border-white/10 bg-black/85 backdrop-blur-md">
-        <div className="shell flex h-[4.5rem] items-center justify-between gap-4">
+      <header className="fixed inset-x-0 top-0 z-40 border-b border-line bg-header backdrop-blur-md">
+        <div className="shell flex h-[4.5rem] items-center justify-between gap-3">
           <Link href="/" aria-label="Motion" className="shrink-0">
-            <Logo className="h-11 w-auto text-motion-green sm:h-12" title="" />
+            <Logo className="h-11 w-auto text-brand sm:h-12" title="" />
           </Link>
 
           <nav
-            className="hidden items-center gap-6 lg:flex"
+            className="hidden items-center gap-5 xl:gap-6 lg:flex"
             aria-label={t.menu.label}
           >
-            {links.map((link, index) => {
+            {links.map((link) => {
               const active =
                 link.href === "/"
                   ? pathname === "/"
@@ -63,11 +64,8 @@ export function Header() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`text-sm transition-colors hover:text-motion-lime ${active ? "text-motion-lime" : "text-white"}`}
+                  className={`text-base transition-colors hover:text-accent ${active ? "text-accent" : "text-page-fg"}`}
                 >
-                  <span className="mr-1 font-display text-[10px] tracking-[0.14em] text-motion-lime/80">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
                   {t.nav[link.key]}
                 </Link>
               );
@@ -75,13 +73,14 @@ export function Header() {
           </nav>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="flex rounded-full border border-white/15 p-0.5 text-xs font-bold tracking-[0.12em]">
+            <ThemeSwitcher />
+            <div className="flex rounded-full border border-line p-0.5 text-xs font-bold tracking-[0.12em]">
               {(["ka", "en"] as const).map((code) => (
                 <button
                   key={code}
                   type="button"
                   onClick={() => setLocale(code)}
-                  className={`rounded-full px-2.5 py-1 uppercase transition-colors ${locale === code ? "bg-motion-lime text-black" : "text-white"}`}
+                  className={`rounded-full px-2.5 py-1 uppercase transition-colors ${locale === code ? "bg-accent text-accent-fg" : "text-page-fg"}`}
                   aria-pressed={locale === code}
                 >
                   {code}
@@ -90,20 +89,20 @@ export function Header() {
             </div>
             <Link
               href="/contact"
-              className="hidden rounded-full bg-motion-lime px-4 py-2 text-sm font-medium text-black sm:inline-flex lg:hidden xl:inline-flex"
+              className="hidden rounded-full bg-accent px-4 py-2 text-sm font-medium text-accent-fg sm:inline-flex lg:hidden xl:inline-flex"
             >
               {t.nav.contact}
             </Link>
             <button
               type="button"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/20 lg:hidden"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-line lg:hidden"
               aria-expanded={open}
               aria-label={open ? t.menu.close : t.menu.open}
               onClick={() => setOpen((value) => !value)}
             >
               <span className="flex w-4 flex-col gap-1.5">
-                <span className="h-px w-full bg-white" />
-                <span className="h-px w-full bg-white" />
+                <span className="h-px w-full bg-page-fg" />
+                <span className="h-px w-full bg-page-fg" />
               </span>
             </button>
           </div>
@@ -113,17 +112,17 @@ export function Header() {
       <AnimatePresence>
         {open ? (
           <motion.div
-            className="fixed inset-0 z-50 flex flex-col bg-black lg:hidden"
+            className="fixed inset-0 z-50 flex flex-col bg-page text-page-fg lg:hidden"
             initial={reduce ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={reduce ? undefined : { opacity: 0 }}
             transition={{ duration: 0.25 }}
           >
             <div className="shell flex h-[4.5rem] items-center justify-between">
-              <Logo className="h-11 w-auto text-motion-green" title="" />
+              <Logo className="h-11 w-auto text-brand" title="" />
               <button
                 type="button"
-                className="rounded-full border border-white/20 px-4 py-2 text-sm"
+                className="rounded-full border border-line px-4 py-2 text-sm"
                 onClick={() => setOpen(false)}
               >
                 {t.menu.close}
@@ -145,12 +144,9 @@ export function Header() {
                 >
                   <Link
                     href={link.href}
-                    className="flex items-baseline gap-4 border-b border-white/10 py-4"
+                    className="block border-b border-line py-4"
                     onClick={() => setOpen(false)}
                   >
-                    <span className="font-display text-sm tracking-[0.16em] text-motion-lime">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
                     <span className="text-4xl font-bold leading-none sm:text-5xl">
                       {t.nav[link.key]}
                     </span>

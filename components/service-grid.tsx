@@ -4,21 +4,21 @@ import Link from "next/link";
 import { useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import type { Service } from "@/content/types";
+import { ServiceIcon } from "./service-icons";
 
 const accents = [
-  "#C8F902",
-  "#015F3A",
-  "#FE725B",
-  "#FF8500",
-  "#004B70",
-  "#820099",
-  "#FF0000",
-  "#FF8500",
-  "#004B70",
-  "#FE725B",
-  "#820099",
-  "#015F3A",
+  "var(--service-1)",
+  "var(--service-2)",
+  "var(--service-3)",
+  "var(--service-4)",
+  "var(--service-5)",
+  "var(--service-6)",
 ] as const;
+
+/** Lime disappears on white — use a darker lime, not brand green. */
+function accentOnLight(color: string) {
+  return color.toLowerCase() === "#c8f902" ? "#6B8A00" : color;
+}
 
 export function ServiceGrid({
   items,
@@ -30,13 +30,12 @@ export function ServiceGrid({
   const reduce = useReducedMotion();
   const [active, setActive] = useState(0);
   const current = items[active] ?? items[0];
-  const accent = accents[active % accents.length];
+  const accent = accentOnLight(accents[active % accents.length]);
 
   if (!detailed) {
     return (
       <ul className="space-y-2 sm:space-y-3">
         {items.map((item, index) => {
-          const number = String(index + 1).padStart(2, "0");
           const color = accents[index % accents.length];
 
           return (
@@ -53,28 +52,31 @@ export function ServiceGrid({
               >
                 <Link
                   href={`/services#${item.id}`}
-                  className="group relative flex items-center gap-4 overflow-hidden rounded-[1.5rem] border border-white/10 bg-gradient-to-r from-white/[0.04] to-transparent px-5 py-5 transition-[border-color,background-color] duration-300 hover:border-transparent sm:gap-6 sm:px-7 sm:py-6"
+                  className="group relative flex items-center gap-4 overflow-hidden rounded-[1.5rem] border border-line bg-soft px-5 py-5 transition-[border-color,background-color] duration-300 hover:border-transparent sm:gap-6 sm:px-7 sm:py-6"
                 >
                   <span
-                    className="pointer-events-none absolute inset-y-0 left-0 w-0 bg-motion-lime transition-[width] duration-500 ease-out group-hover:w-full"
+                    className="pointer-events-none absolute inset-y-0 left-0 w-0 bg-accent transition-[width] duration-500 ease-out group-hover:w-full"
                     aria-hidden
                   />
                   <span
-                    className="relative font-display text-[clamp(2rem,5vw,3.4rem)] leading-none tracking-tight opacity-80 transition-[color,opacity] duration-300 group-hover:!text-black group-hover:opacity-100"
+                    className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-line bg-soft transition-[border-color,background-color,color] duration-300 group-hover:border-accent-fg/20 group-hover:bg-accent-fg/5 group-hover:!text-accent-fg sm:h-14 sm:w-14"
                     style={{ color }}
                   >
-                    {number}
+                    <ServiceIcon
+                      id={item.id}
+                      className="h-6 w-6 sm:h-7 sm:w-7"
+                    />
                   </span>
                   <span className="relative min-w-0 flex-1">
-                    <span className="block text-xl font-bold leading-tight text-white transition-colors duration-300 group-hover:text-black sm:text-2xl lg:text-[1.7rem]">
+                    <span className="block text-xl font-bold leading-tight text-page-fg transition-colors duration-300 group-hover:text-accent-fg sm:text-2xl lg:text-[1.7rem]">
                       {item.name}
                     </span>
-                    <span className="mt-1.5 block max-w-xl text-sm leading-relaxed text-white/55 transition-colors duration-300 group-hover:text-black/65 sm:text-[0.95rem]">
+                    <span className="mt-1.5 block max-w-xl text-sm leading-relaxed text-fg-muted transition-colors duration-300 group-hover:text-accent-fg sm:text-[0.95rem]">
                       {item.summary}
                     </span>
                   </span>
                   <span
-                    className="relative hidden h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/20 text-lg text-white transition-all duration-300 group-hover:border-black group-hover:bg-black group-hover:text-motion-lime sm:inline-flex"
+                    className="relative hidden h-11 w-11 shrink-0 items-center justify-center rounded-full border border-line text-lg text-page-fg transition-all duration-300 group-hover:border-accent-fg group-hover:bg-accent-fg group-hover:text-accent sm:inline-flex"
                     aria-hidden
                   >
                     →
@@ -91,7 +93,7 @@ export function ServiceGrid({
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] lg:gap-10">
       <aside className="relative hidden min-h-full lg:block">
-        <div className="sticky top-24 z-[5] rounded-[2rem] bg-white p-8 text-black shadow-[0_20px_60px_rgba(0,0,0,0.35)]">
+        <div className="sticky top-24 z-[5] rounded-[2rem] bg-card p-8 text-card-fg shadow-[0_20px_60px_rgba(0,0,0,0.25)]">
           <AnimatePresence mode="wait">
             <motion.div
               key={current.id}
@@ -102,15 +104,15 @@ export function ServiceGrid({
               className="flex min-h-[22rem] flex-col"
             >
               <span
-                className="font-display text-[clamp(4.5rem,10vw,8rem)] leading-none tracking-tight"
-                style={{ color: accent }}
+                className="flex h-20 w-20 items-center justify-center rounded-[1.4rem]"
+                style={{ background: `${accent}22`, color: accent }}
               >
-                {String(active + 1).padStart(2, "0")}
+                <ServiceIcon id={current.id} className="h-10 w-10" />
               </span>
-              <h2 className="mt-5 max-w-md text-3xl font-bold leading-[1.05] xl:text-4xl">
+              <h2 className="mt-6 max-w-md text-3xl font-bold leading-[1.05] xl:text-4xl">
                 {current.name}
               </h2>
-              <p className="mt-4 max-w-md text-base leading-relaxed text-black/70 xl:text-lg">
+              <p className="mt-4 max-w-md text-base leading-relaxed text-card-fg/70 xl:text-lg">
                 {current.summary}
               </p>
               <div className="mt-auto pt-8">
@@ -126,9 +128,9 @@ export function ServiceGrid({
 
       <ul className="space-y-2">
         {items.map((item, index) => {
-          const number = String(index + 1).padStart(2, "0");
           const color = accents[index % accents.length];
           const isActive = active === index;
+          const lightColor = accentOnLight(color);
 
           return (
             <li key={item.id} id={item.id} className="scroll-mt-28">
@@ -139,8 +141,8 @@ export function ServiceGrid({
                 onFocus={() => setActive(index)}
                 className={`group relative w-full overflow-hidden rounded-[1.35rem] border px-5 py-4 text-left transition-[background-color,border-color,color] duration-300 sm:px-6 sm:py-5 ${
                   isActive
-                    ? "border-transparent bg-white text-black"
-                    : "border-white/15 bg-white/[0.04] text-white hover:border-white/30 hover:bg-white/[0.07]"
+                    ? "border-transparent bg-card text-card-fg"
+                    : "border-line bg-soft text-page-fg hover:border-accent/30"
                 }`}
                 initial={reduce ? false : { opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -154,15 +156,22 @@ export function ServiceGrid({
                 <span
                   className="absolute inset-y-0 left-0 w-1.5"
                   style={{
-                    backgroundColor: isActive ? color : "rgba(200,249,2,0.35)",
+                    backgroundColor: isActive ? lightColor : color,
                   }}
                 />
                 <span className="flex items-start gap-4 sm:gap-5">
                   <span
-                    className="font-display text-sm tracking-[0.18em] sm:text-base"
-                    style={{ color: isActive ? color : "#C8F902" }}
+                    className={`mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border sm:h-12 sm:w-12 ${
+                      isActive
+                        ? "border-line bg-soft"
+                        : "border-line bg-soft"
+                    }`}
+                    style={{ color: isActive ? lightColor : color }}
                   >
-                    {number}
+                    <ServiceIcon
+                      id={item.id}
+                      className="h-5 w-5 sm:h-6 sm:w-6"
+                    />
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block text-xl font-bold leading-tight sm:text-2xl">
@@ -176,7 +185,7 @@ export function ServiceGrid({
                           animate={{ height: "auto", opacity: 1 }}
                           exit={reduce ? undefined : { height: 0, opacity: 0 }}
                           transition={{ duration: 0.28 }}
-                          className="mt-2 block overflow-hidden text-sm leading-relaxed text-black/65 lg:hidden"
+                          className="mt-2 block overflow-hidden text-sm leading-relaxed text-card-fg/65 lg:hidden"
                         >
                           {item.summary}
                         </motion.span>
@@ -185,7 +194,7 @@ export function ServiceGrid({
                   </span>
                   <span
                     aria-hidden
-                    className={`mt-1 hidden sm:inline ${isActive ? "text-black" : "text-motion-lime/50"}`}
+                    className={`mt-1 hidden sm:inline ${isActive ? "text-card-fg" : "text-accent/50"}`}
                   >
                     →
                   </span>

@@ -7,9 +7,26 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        page: "var(--page)",
+        "page-fg": "var(--page-fg)",
+        panel: "var(--panel)",
+        "panel-fg": "var(--panel-fg)",
+        muted: "var(--muted)",
+        "muted-fg": "var(--muted-fg)",
+        band: "var(--band)",
+        "band-fg": "var(--band-fg)",
+        accent: "var(--accent)",
+        "accent-fg": "var(--accent-fg)",
+        brand: "var(--brand)",
+        line: "var(--line)",
+        header: "var(--header)",
+        soft: "var(--soft)",
+        "fg-muted": "var(--fg-muted)",
+        card: "var(--card)",
+        "card-fg": "var(--card-fg)",
         motion: {
-          green: "#015F3A",
-          lime: "#C8F902",
+          green: "var(--brand)",
+          lime: "var(--accent)",
           black: "#000000",
           white: "#FFFFFF",
           red: "#FF0000",
