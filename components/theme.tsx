@@ -10,6 +10,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
+import { createPortal } from "react-dom";
 import { HexColorPicker } from "react-colorful";
 import { Moon, Palette, RotateCcw, Sun, X } from "lucide-react";
 import { useLocale } from "./locale";
@@ -429,49 +430,48 @@ function ColorField({
   }, [open]);
 
   return (
-    <div
-      ref={rootRef}
-      className="relative flex items-center justify-between gap-3 rounded-xl border border-line bg-soft px-3 py-2"
-    >
-      <span className="min-w-0 flex-1 truncate text-xs text-page-fg">
-        {label}
-      </span>
-      <div className="flex items-center gap-2">
-        <button
-          type="button"
-          aria-label={label}
-          aria-expanded={open}
-          onClick={() => setOpen((prev) => !prev)}
-          className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full border border-line shadow-[inset_0_0_0_1px_rgba(0,0,0,0.08)] transition-transform hover:scale-105"
-          style={{ background: value }}
-        />
-        <input
-          type="text"
-          value={editing ? draft : value}
-          onChange={(event) => {
-            const next = event.target.value;
-            setDraft(next);
-            if (/^#[0-9a-fA-F]{6}$/.test(next.trim())) {
-              onChange(next.trim().toLowerCase());
-            }
-          }}
-          onFocus={() => {
-            setDraft(value);
-            setEditing(true);
-            setOpen(true);
-          }}
-          onBlur={() => setEditing(false)}
-          spellCheck={false}
-          className="w-[5.6rem] rounded-lg border border-line bg-page px-2 py-1.5 font-mono text-[11px] uppercase text-page-fg outline-none focus:border-accent"
-        />
+    <div ref={rootRef} className="rounded-xl border border-line bg-soft px-3 py-2">
+      <div className="flex items-center justify-between gap-3">
+        <span className="min-w-0 flex-1 truncate text-xs text-page-fg">
+          {label}
+        </span>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            aria-label={label}
+            aria-expanded={open}
+            onClick={() => setOpen((prev) => !prev)}
+            className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full border border-line shadow-[inset_0_0_0_1px_rgba(0,0,0,0.08)] transition-transform hover:scale-105"
+            style={{ background: value }}
+          />
+          <input
+            type="text"
+            value={editing ? draft : value}
+            onChange={(event) => {
+              const next = event.target.value;
+              setDraft(next);
+              if (/^#[0-9a-fA-F]{6}$/.test(next.trim())) {
+                onChange(next.trim().toLowerCase());
+              }
+            }}
+            onFocus={() => {
+              setDraft(value);
+              setEditing(true);
+              setOpen(true);
+            }}
+            onBlur={() => setEditing(false)}
+            spellCheck={false}
+            className="w-[4.75rem] rounded-lg border border-line bg-page px-2 py-1.5 font-mono text-[11px] uppercase text-page-fg outline-none focus:border-accent sm:w-[5.6rem]"
+          />
+        </div>
       </div>
 
       {open ? (
-        <div className="absolute right-0 top-[calc(100%+0.45rem)] z-[70] w-[13.5rem] rounded-2xl border border-line bg-page p-3 shadow-[0_20px_50px_rgba(0,0,0,0.45)]">
+        <div className="mt-3 rounded-xl border border-line bg-page p-3">
           <HexColorPicker
             color={value}
             onChange={(next) => onChange(next.toLowerCase())}
-            className="!h-[8.5rem] !w-full"
+            className="!h-[7.5rem] !w-full sm:!h-[8.5rem]"
           />
           <div className="mt-3 grid grid-cols-6 gap-1.5">
             {COLOR_PRESETS.map((preset) => {
@@ -507,69 +507,129 @@ function ColorField({
   );
 }
 
-function CustomThemePanel({ onClose }: { onClose: () => void }) {
+function CustomThemePanel({
+  onClose,
+  anchorRef,
+}: {
+  onClose: () => void;
+  anchorRef: React.RefObject<HTMLDivElement | null>;
+}) {
   const { custom, updateCustom, resetCustom, t } = useThemeWithLocale();
+  const [desktopPos, setDesktopPos] = useState<{ top: number; right: number } | null>(
+    null,
+  );
+  const isClient = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
 
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
       if (event.key === "Escape") onClose();
     }
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = previous;
+      window.removeEventListener("keydown", onKey);
+    };
   }, [onClose]);
 
-  return (
-    <div
-      role="dialog"
-      aria-label={t.theme.customTitle}
-      className="absolute right-0 top-[calc(100%+0.65rem)] z-[60] w-[min(22rem,calc(100vw-1.5rem))] overflow-hidden rounded-2xl border border-line bg-page text-page-fg shadow-[0_24px_60px_rgba(0,0,0,0.35)]"
-    >
-      <div className="flex items-center justify-between border-b border-line px-4 py-3">
-        <div>
-          <p className="text-sm font-semibold">{t.theme.customTitle}</p>
-          <p className="mt-0.5 text-xs text-fg-muted">{t.theme.customHint}</p>
-        </div>
-        <div className="flex items-center gap-1">
-          <button
-            type="button"
-            onClick={resetCustom}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-line text-page-fg transition-colors hover:border-accent hover:text-accent"
-            title={t.theme.reset}
-            aria-label={t.theme.reset}
-          >
-            <RotateCcw className="h-3.5 w-3.5" strokeWidth={2.25} />
-          </button>
-          <button
-            type="button"
-            onClick={onClose}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-line text-page-fg transition-colors hover:border-accent hover:text-accent"
-            aria-label={t.theme.close}
-          >
-            <X className="h-3.5 w-3.5" strokeWidth={2.25} />
-          </button>
-        </div>
-      </div>
+  useEffect(() => {
+    function place() {
+      const anchor = anchorRef.current;
+      if (!anchor || window.innerWidth < 768) {
+        setDesktopPos(null);
+        return;
+      }
+      const rect = anchor.getBoundingClientRect();
+      setDesktopPos({
+        top: rect.bottom + 10,
+        right: Math.max(12, window.innerWidth - rect.right),
+      });
+    }
+    place();
+    window.addEventListener("resize", place);
+    window.addEventListener("scroll", place, true);
+    return () => {
+      window.removeEventListener("resize", place);
+      window.removeEventListener("scroll", place, true);
+    };
+  }, [anchorRef]);
 
-      <div className="max-h-[min(28rem,70vh)] space-y-5 overflow-y-auto p-4">
-        {FIELD_GROUPS.map((group) => (
-          <div key={group.titleKey}>
-            <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.14em] text-fg-muted">
-              {t.theme.groups[group.titleKey]}
+  if (!isClient) return null;
+
+  return createPortal(
+    <>
+      <button
+        type="button"
+        aria-label={t.theme.close}
+        className="fixed inset-0 z-[80] bg-black/55 md:bg-black/25"
+        onClick={onClose}
+      />
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={t.theme.customTitle}
+        className="fixed inset-x-0 bottom-0 top-16 z-[90] flex flex-col overflow-hidden border-t border-line bg-page text-page-fg shadow-[0_-12px_40px_rgba(0,0,0,0.35)] sm:top-[4.5rem] md:inset-auto md:max-h-[min(36rem,75vh)] md:w-[min(22rem,calc(100vw-1.5rem))] md:rounded-2xl md:border md:border-t md:shadow-[0_24px_60px_rgba(0,0,0,0.45)]"
+        style={
+          desktopPos
+            ? { top: desktopPos.top, right: desktopPos.right }
+            : undefined
+        }
+      >
+        <div className="flex items-center justify-between border-b border-line px-4 py-3">
+          <div className="min-w-0 pr-3">
+            <p className="text-sm font-semibold">{t.theme.customTitle}</p>
+            <p className="mt-0.5 truncate text-xs text-fg-muted">
+              {t.theme.customHint}
             </p>
-            <div className="space-y-2">
-              {group.fields.map((field) => (
-                <ColorField
-                  key={field}
-                  label={t.theme.fields[field]}
-                  value={custom[field]}
-                  onChange={(value) => updateCustom(field, value)}
-                />
-              ))}
-            </div>
           </div>
-        ))}
+          <div className="flex shrink-0 items-center gap-1">
+            <button
+              type="button"
+              onClick={resetCustom}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-line text-page-fg transition-colors hover:border-accent hover:text-accent"
+              title={t.theme.reset}
+              aria-label={t.theme.reset}
+            >
+              <RotateCcw className="h-3.5 w-3.5" strokeWidth={2.25} />
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-line text-page-fg transition-colors hover:border-accent hover:text-accent"
+              aria-label={t.theme.close}
+            >
+              <X className="h-3.5 w-3.5" strokeWidth={2.25} />
+            </button>
+          </div>
+        </div>
+
+        <div className="flex-1 space-y-5 overflow-y-auto overscroll-contain p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+          {FIELD_GROUPS.map((group) => (
+            <div key={group.titleKey}>
+              <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.14em] text-fg-muted">
+                {t.theme.groups[group.titleKey]}
+              </p>
+              <div className="space-y-2">
+                {group.fields.map((field) => (
+                  <ColorField
+                    key={field}
+                    label={t.theme.fields[field]}
+                    value={custom[field]}
+                    onChange={(value) => updateCustom(field, value)}
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
+    </>,
+    document.body,
   );
 }
 
@@ -582,6 +642,7 @@ function useThemeWithLocale() {
 export function ThemeSwitcher() {
   const { theme, setTheme, t } = useThemeWithLocale();
   const [open, setOpen] = useState(false);
+  const anchorRef = useRef<HTMLDivElement>(null);
 
   const options = [
     { id: "noir" as const, label: t.theme.names.noir, icon: Moon },
@@ -590,7 +651,7 @@ export function ThemeSwitcher() {
   ];
 
   return (
-    <div className="relative">
+    <div className="relative" ref={anchorRef}>
       <div
         className="flex items-center gap-0.5 rounded-full border border-line bg-soft p-0.5"
         role="group"
@@ -625,8 +686,11 @@ export function ThemeSwitcher() {
           );
         })}
       </div>
-      {theme === "custom" && open ? (
-        <CustomThemePanel onClose={() => setOpen(false)} />
+      {open ? (
+        <CustomThemePanel
+          anchorRef={anchorRef}
+          onClose={() => setOpen(false)}
+        />
       ) : null}
     </div>
   );

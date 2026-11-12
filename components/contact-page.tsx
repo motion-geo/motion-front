@@ -34,23 +34,23 @@ export function ContactPage() {
 
   return (
     <div className="bg-page text-page-fg">
-      <div className="shell grid gap-12 py-14 md:py-20 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+      <div className="shell grid gap-8 py-10 sm:gap-12 sm:py-14 md:py-20 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
         <header>
           <SectionLabel>{t.contact.label}</SectionLabel>
-          <h1 className="mt-4 text-[clamp(2.4rem,6vw,4.8rem)] font-bold leading-[0.95]">
+          <h1 className="mt-4 text-[clamp(2.1rem,9vw,4.8rem)] font-bold leading-[0.95]">
             {t.contact.title}
           </h1>
-          <p className="mt-6 max-w-md text-lg leading-relaxed text-fg-muted">
+          <p className="mt-5 max-w-md text-base leading-relaxed text-fg-muted sm:mt-6 sm:text-lg">
             {t.contact.lead}
           </p>
-          <p className="mt-6 max-w-md border-l-2 border-accent pl-4 text-sm leading-relaxed text-fg-muted">
+          <p className="mt-5 max-w-md border-l-2 border-accent pl-4 text-sm leading-relaxed text-fg-muted sm:mt-6">
             {t.contact.note}
           </p>
         </header>
 
         {sent ? (
-          <div className="rounded-[1.8rem] bg-accent p-8 text-accent-fg sm:p-10">
-            <h2 className="text-3xl font-bold leading-tight sm:text-4xl">
+          <div className="rounded-[1.5rem] bg-accent p-6 text-accent-fg sm:rounded-[1.8rem] sm:p-10">
+            <h2 className="text-2xl font-bold leading-tight sm:text-4xl">
               {t.contact.successTitle}
             </h2>
             <p className="mt-4 max-w-md text-base leading-relaxed">
@@ -68,9 +68,9 @@ export function ContactPage() {
           <form
             onSubmit={onSubmit}
             noValidate
-            className="rounded-[1.8rem] border border-line bg-soft p-6 sm:p-8"
+            className="min-w-0 rounded-[1.5rem] border border-line bg-soft p-4 sm:rounded-[1.8rem] sm:p-8"
           >
-            <div className="grid gap-5 sm:grid-cols-2">
+            <div className="grid gap-4 sm:grid-cols-2 sm:gap-5">
               <Field
                 label={t.contact.name}
                 name="name"

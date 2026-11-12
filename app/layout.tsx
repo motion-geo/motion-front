@@ -41,7 +41,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <LocaleProvider>
           <ThemeProvider>
             <Header />
-            <main className="flex-1 pt-[4.5rem]">{children}</main>
+            <main className="flex-1 pt-16 sm:pt-[4.5rem]">{children}</main>
             <Footer />
           </ThemeProvider>
         </LocaleProvider>

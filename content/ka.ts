@@ -218,6 +218,7 @@ export const ka: Dictionary = {
     open: "მენიუს გახსნა",
     close: "მენიუს დახურვა",
     label: "მთავარი მენიუ",
+    language: "ენა",
   },
   theme: {
     label: "თემა",

@@ -18,7 +18,7 @@ export function HomePage() {
   return (
     <>
       <section className="bg-page text-page-fg">
-        <div className="shell grid min-h-[calc(100svh-4.5rem)] items-center gap-12 py-12 lg:grid-cols-[1.12fr_0.88fr] lg:py-16">
+        <div className="shell grid min-h-[calc(100svh-4rem)] items-center gap-8 py-10 sm:min-h-[calc(100svh-4.5rem)] sm:gap-12 sm:py-12 lg:grid-cols-[1.12fr_0.88fr] lg:py-16">
           <Reveal>
             <SectionLabel>Motion</SectionLabel>
             <h1 className="mt-5 max-w-4xl text-[clamp(2.35rem,6.2vw,5.5rem)] font-bold leading-[0.94] tracking-tight">

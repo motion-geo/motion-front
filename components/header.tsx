@@ -46,9 +46,9 @@ export function Header() {
   return (
     <>
       <header className="fixed inset-x-0 top-0 z-40 border-b border-line bg-header backdrop-blur-md">
-        <div className="shell flex h-[4.5rem] items-center justify-between gap-3">
-          <Link href="/" aria-label="Motion" className="shrink-0">
-            <Logo className="h-11 w-auto text-brand sm:h-12" title="" />
+        <div className="shell flex h-16 items-center justify-between gap-2 sm:h-[4.5rem] sm:gap-3">
+          <Link href="/" aria-label="Motion" className="min-w-0 shrink">
+            <Logo className="h-9 w-auto max-w-[7.5rem] text-brand sm:h-12 sm:max-w-none" title="" />
           </Link>
 
           <nav
@@ -72,9 +72,9 @@ export function Header() {
             })}
           </nav>
 
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-3">
             <ThemeSwitcher />
-            <div className="flex rounded-full border border-line p-0.5 text-xs font-bold tracking-[0.12em]">
+            <div className="hidden rounded-full border border-line p-0.5 text-xs font-bold tracking-[0.12em] sm:flex">
               {(["ka", "en"] as const).map((code) => (
                 <button
                   key={code}
@@ -89,13 +89,13 @@ export function Header() {
             </div>
             <Link
               href="/contact"
-              className="hidden rounded-full bg-accent px-4 py-2 text-sm font-medium text-accent-fg sm:inline-flex lg:hidden xl:inline-flex"
+              className="hidden rounded-full bg-accent px-4 py-2 text-sm font-medium text-accent-fg xl:inline-flex"
             >
               {t.nav.contact}
             </Link>
             <button
               type="button"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-line lg:hidden"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-line sm:h-10 sm:w-10 lg:hidden"
               aria-expanded={open}
               aria-label={open ? t.menu.close : t.menu.open}
               onClick={() => setOpen((value) => !value)}
@@ -118,8 +118,8 @@ export function Header() {
             exit={reduce ? undefined : { opacity: 0 }}
             transition={{ duration: 0.25 }}
           >
-            <div className="shell flex h-[4.5rem] items-center justify-between">
-              <Logo className="h-11 w-auto text-brand" title="" />
+            <div className="shell flex h-16 items-center justify-between sm:h-[4.5rem]">
+              <Logo className="h-9 w-auto text-brand sm:h-11" title="" />
               <button
                 type="button"
                 className="rounded-full border border-line px-4 py-2 text-sm"
@@ -128,8 +128,26 @@ export function Header() {
                 {t.menu.close}
               </button>
             </div>
+            <div className="shell flex items-center justify-between gap-3 border-b border-line py-3 sm:hidden">
+              <p className="text-xs font-bold uppercase tracking-[0.14em] text-fg-muted">
+                {t.menu.language}
+              </p>
+              <div className="flex rounded-full border border-line p-0.5 text-xs font-bold tracking-[0.12em]">
+                {(["ka", "en"] as const).map((code) => (
+                  <button
+                    key={code}
+                    type="button"
+                    onClick={() => setLocale(code)}
+                    className={`rounded-full px-3 py-1.5 uppercase transition-colors ${locale === code ? "bg-accent text-accent-fg" : "text-page-fg"}`}
+                    aria-pressed={locale === code}
+                  >
+                    {code}
+                  </button>
+                ))}
+              </div>
+            </div>
             <nav
-              className="shell flex flex-1 flex-col justify-center"
+              className="shell flex flex-1 flex-col justify-center overflow-y-auto pb-10"
               aria-label={t.menu.label}
             >
               {links.map((link, index) => (
@@ -147,7 +165,7 @@ export function Header() {
                     className="block border-b border-line py-4"
                     onClick={() => setOpen(false)}
                   >
-                    <span className="text-4xl font-bold leading-none sm:text-5xl">
+                    <span className="text-[2rem] font-bold leading-none sm:text-5xl">
                       {t.nav[link.key]}
                     </span>
                   </Link>

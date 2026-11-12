@@ -52,26 +52,26 @@ export function ServiceGrid({
               >
                 <Link
                   href={`/services#${item.id}`}
-                  className="group relative flex items-center gap-4 overflow-hidden rounded-[1.5rem] border border-line bg-soft px-5 py-5 transition-[border-color,background-color] duration-300 hover:border-transparent sm:gap-6 sm:px-7 sm:py-6"
+                  className="group relative flex min-w-0 items-center gap-3 overflow-hidden rounded-[1.25rem] border border-line bg-soft px-4 py-4 transition-[border-color,background-color] duration-300 hover:border-transparent sm:gap-6 sm:rounded-[1.5rem] sm:px-7 sm:py-6"
                 >
                   <span
                     className="pointer-events-none absolute inset-y-0 left-0 w-0 bg-accent transition-[width] duration-500 ease-out group-hover:w-full"
                     aria-hidden
                   />
                   <span
-                    className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-line bg-soft transition-[border-color,background-color,color] duration-300 group-hover:border-accent-fg/20 group-hover:bg-accent-fg/5 group-hover:!text-accent-fg sm:h-14 sm:w-14"
+                    className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-line bg-soft transition-[border-color,background-color,color] duration-300 group-hover:border-accent-fg/20 group-hover:bg-accent-fg/5 group-hover:!text-accent-fg sm:h-14 sm:w-14 sm:rounded-2xl"
                     style={{ color }}
                   >
                     <ServiceIcon
                       id={item.id}
-                      className="h-6 w-6 sm:h-7 sm:w-7"
+                      className="h-5 w-5 sm:h-7 sm:w-7"
                     />
                   </span>
                   <span className="relative min-w-0 flex-1">
-                    <span className="block text-xl font-bold leading-tight text-page-fg transition-colors duration-300 group-hover:text-accent-fg sm:text-2xl lg:text-[1.7rem]">
+                    <span className="block text-lg font-bold leading-tight text-page-fg transition-colors duration-300 group-hover:text-accent-fg sm:text-2xl lg:text-[1.7rem]">
                       {item.name}
                     </span>
-                    <span className="mt-1.5 block max-w-xl text-sm leading-relaxed text-fg-muted transition-colors duration-300 group-hover:text-accent-fg sm:text-[0.95rem]">
+                    <span className="mt-1 block max-w-xl text-sm leading-relaxed text-fg-muted transition-colors duration-300 group-hover:text-accent-fg sm:mt-1.5 sm:text-[0.95rem]">
                       {item.summary}
                     </span>
                   </span>

@@ -219,6 +219,7 @@ export const en: Dictionary = {
     open: "Open menu",
     close: "Close menu",
     label: "Main menu",
+    language: "Language",
   },
   theme: {
     label: "Theme",

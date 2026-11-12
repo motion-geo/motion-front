@@ -85,7 +85,7 @@ export type Dictionary = {
   };
   ctaBand: { title: string; body: string };
   footer: { rights: string; prototype: string };
-  menu: { open: string; close: string; label: string };
+  menu: { open: string; close: string; label: string; language: string };
   theme: {
     label: string;
     names: {
