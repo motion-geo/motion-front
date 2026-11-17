@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { BrandVideo } from "./brand-video";
 import { useLocale, usePageTitle } from "./locale";
 import { Mark } from "./logo";
@@ -8,12 +9,15 @@ import { Marquee } from "./marquee";
 import { Reveal } from "./reveal";
 import { SampleBadge, SectionLabel } from "./section-label";
 import { ServiceGrid } from "./service-grid";
-import { partnerFaces, workFaces } from "./work-styles";
+import { VideoLightbox, type LightboxWork } from "./video-lightbox";
+import { WorkCard } from "./work-card";
+import { partnerFaces } from "./work-styles";
 
 export function HomePage() {
   const { t } = useLocale();
   usePageTitle(t.meta.title);
   const preview = t.works.items.slice(0, 3);
+  const [active, setActive] = useState<LightboxWork | null>(null);
 
   return (
     <>
@@ -152,34 +156,22 @@ export function HomePage() {
           </Reveal>
           <div className="grid gap-4 md:grid-cols-3">
             {preview.map((item, index) => {
-              const face = workFaces[item.id];
               const service = t.services.items.find(
                 (entry) => entry.id === item.serviceId,
               );
               return (
                 <Reveal key={item.id} delay={index * 0.06}>
-                  <Link
-                    href="/works"
-                    className="group flex h-full flex-col overflow-hidden rounded-[1.7rem] bg-card text-card-fg"
-                  >
-                    <div
-                      className="relative aspect-[4/3] p-5"
-                      style={{ background: face.bg, color: face.fg }}
-                    >
-                      <div className="flex items-start justify-end">
-                        <SampleBadge label={t.sample} />
-                      </div>
-                      <Mark className="absolute bottom-4 right-4 h-14 w-16 transition-transform duration-300 group-hover:translate-x-1" />
-                    </div>
-                    <div className="flex flex-1 flex-col p-5">
-                      <p className="text-xs font-bold uppercase tracking-[0.16em] text-brand">
-                        {service?.name}
-                      </p>
-                      <h3 className="mt-2 text-2xl font-bold leading-tight">
-                        {item.title}
-                      </h3>
-                    </div>
-                  </Link>
+                  <WorkCard
+                    item={item}
+                    serviceName={service?.name}
+                    sampleLabel={t.sample}
+                    playLabel={t.works.play}
+                    openLabel={t.works.open}
+                    videoLabel={t.works.video}
+                    photoLabel={t.works.photo}
+                    onOpen={setActive}
+                    showSummary={false}
+                  />
                 </Reveal>
               );
             })}
@@ -222,15 +214,29 @@ export function HomePage() {
             </Link>
           </Reveal>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {partnerFaces.slice(0, 4).map((face) => (
-              <div
-                key={face.bg}
-                className="flex aspect-[1.7/1] items-center justify-center rounded-2xl"
-                style={{ background: face.bg, color: face.fg }}
-              >
-                <Mark className="h-12 w-14" />
-              </div>
-            ))}
+            {t.partners.items.slice(0, 4).map((partner) => {
+              const face = partnerFaces[partner.id] ?? {
+                bg: "#141414",
+                fg: "#FFFFFF",
+              };
+              return (
+                <Link
+                  key={partner.id}
+                  href={`/partners/${partner.id}`}
+                  aria-label={`${t.partners.open}: ${partner.name}`}
+                  className="group flex aspect-[1.7/1] flex-col justify-between rounded-2xl p-4 transition-transform duration-300 hover:scale-[1.02]"
+                  style={{ background: face.bg, color: face.fg }}
+                >
+                  <p className="text-[10px] font-bold uppercase tracking-[0.14em] opacity-80">
+                    {partner.role}
+                  </p>
+                  <div className="flex items-end justify-between gap-2">
+                    <p className="truncate text-sm font-bold">{partner.name}</p>
+                    <Mark className="h-10 w-12 shrink-0 transition-transform duration-300 group-hover:translate-x-0.5" />
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -251,6 +257,13 @@ export function HomePage() {
           </Reveal>
         </div>
       </section>
+
+      <VideoLightbox
+        work={active}
+        onClose={() => setActive(null)}
+        closeLabel={t.works.closePlayer}
+        photoLabel={t.works.photo}
+      />
     </>
   );
 }

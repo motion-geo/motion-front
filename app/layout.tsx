@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { Alatsi, Noto_Sans_Georgian } from "next/font/google";
+import { AuthProvider } from "@/components/auth";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import { LocaleProvider } from "@/components/locale";
 import { ThemeProvider, themeInitScript } from "@/components/theme";
+import { ThemeInitScript } from "@/components/theme-init-script";
 import "./globals.css";
 
 const noto = Noto_Sans_Georgian({
@@ -35,14 +37,16 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
     >
       <head>
-        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+        <ThemeInitScript html={themeInitScript} />
       </head>
       <body className="flex min-h-full flex-col bg-page font-sans text-page-fg">
         <LocaleProvider>
           <ThemeProvider>
-            <Header />
-            <main className="flex-1 pt-16 sm:pt-[4.5rem]">{children}</main>
-            <Footer />
+            <AuthProvider>
+              <Header />
+              <main className="flex-1 pt-16 sm:pt-[4.5rem]">{children}</main>
+              <Footer />
+            </AuthProvider>
           </ThemeProvider>
         </LocaleProvider>
       </body>

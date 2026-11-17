@@ -13,9 +13,30 @@ export type WorkItem = {
   summary: string;
 };
 
+export type Partner = {
+  id: string;
+  name: string;
+  role: string;
+  summary: string;
+  about: string;
+  focus: string[];
+  workIds: string[];
+  since: string;
+};
+
 export type TermSection = {
   title: string;
   body: string;
+};
+
+export type Plan = {
+  id: string;
+  name: string;
+  price: string;
+  period: string;
+  summary: string;
+  features: string[];
+  featured?: boolean;
 };
 
 export type Dictionary = {
@@ -25,8 +46,13 @@ export type Dictionary = {
     services: string;
     works: string;
     partners: string;
+    plans: string;
     terms: string;
     contact: string;
+    login: string;
+    register: string;
+    profile: string;
+    logout: string;
   };
   sample: string;
   cta: {
@@ -45,11 +71,31 @@ export type Dictionary = {
     lead: string;
     items: Service[];
   };
+  plans: {
+    label: string;
+    title: string;
+    lead: string;
+    note: string;
+    choose: string;
+    from: string;
+    items: Plan[];
+    custom: {
+      label: string;
+      title: string;
+      body: string;
+      cta: string;
+    };
+  };
   works: {
     label: string;
     title: string;
     lead: string;
     all: string;
+    play: string;
+    open: string;
+    closePlayer: string;
+    video: string;
+    photo: string;
     items: WorkItem[];
   };
   reel: { label: string; title: string; body: string };
@@ -58,6 +104,14 @@ export type Dictionary = {
     title: string;
     lead: string;
     slot: string;
+    back: string;
+    aboutLabel: string;
+    focusLabel: string;
+    worksLabel: string;
+    sinceLabel: string;
+    open: string;
+    notFound: string;
+    items: Partner[];
   };
   terms: {
     label: string;
@@ -83,6 +137,48 @@ export type Dictionary = {
     required: string;
     emailInvalid: string;
   };
+  auth: {
+    loginLabel: string;
+    loginTitle: string;
+    loginLead: string;
+    loginSubmit: string;
+    loginSuccessTitle: string;
+    loginSuccessBody: string;
+    registerLabel: string;
+    registerTitle: string;
+    registerLead: string;
+    registerSubmit: string;
+    registerSuccessTitle: string;
+    registerSuccessBody: string;
+    email: string;
+    phone: string;
+    nameOrCompany: string;
+    password: string;
+    confirmPassword: string;
+    note: string;
+    again: string;
+    required: string;
+    emailInvalid: string;
+    phoneInvalid: string;
+    passwordShort: string;
+    passwordMismatch: string;
+    toLogin: string;
+    toRegister: string;
+  };
+  profile: {
+    label: string;
+    title: string;
+    lead: string;
+    personal: string;
+    plan: string;
+    works: string;
+    worksTitle: string;
+    allWorks: string;
+    viewPlans: string;
+    noPlan: string;
+    noWorks: string;
+    redirecting: string;
+  };
   ctaBand: { title: string; body: string };
   footer: { rights: string; prototype: string };
   menu: { open: string; close: string; label: string; language: string };
@@ -91,34 +187,6 @@ export type Dictionary = {
     names: {
       noir: string;
       day: string;
-      custom: string;
-    };
-    customTitle: string;
-    customHint: string;
-    reset: string;
-    close: string;
-    groups: {
-      surfaces: string;
-      text: string;
-      accents: string;
-    };
-    fields: {
-      page: string;
-      pageFg: string;
-      panel: string;
-      panelFg: string;
-      muted: string;
-      mutedFg: string;
-      band: string;
-      bandFg: string;
-      accent: string;
-      accentFg: string;
-      brand: string;
-      card: string;
-      cardFg: string;
-      line: string;
-      fgMuted: string;
-      icon: string;
     };
   };
 };

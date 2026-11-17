@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { LogOut, UserRound } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { useAuth } from "./auth";
 import { Logo } from "./logo";
 import { useLocale } from "./locale";
 import { ThemeSwitcher } from "./theme";
@@ -13,15 +15,23 @@ const links = [
   { href: "/services", key: "services" },
   { href: "/works", key: "works" },
   { href: "/partners", key: "partners" },
-  { href: "/terms", key: "terms" },
+  { href: "/plans", key: "plans" },
   { href: "/contact", key: "contact" },
 ] as const;
 
 export function Header() {
   const pathname = usePathname();
+  const router = useRouter();
   const { t, locale, setLocale } = useLocale();
+  const { user, logout } = useAuth();
   const reduce = useReducedMotion();
   const [open, setOpen] = useState(false);
+
+  function handleLogout() {
+    logout();
+    setOpen(false);
+    router.push("/");
+  }
 
   useEffect(() => {
     setOpen(false);
@@ -52,7 +62,7 @@ export function Header() {
           </Link>
 
           <nav
-            className="hidden items-center gap-5 xl:gap-6 lg:flex"
+            className="hidden items-center gap-4 text-sm 2xl:gap-6 2xl:text-base xl:flex"
             aria-label={t.menu.label}
           >
             {links.map((link) => {
@@ -64,7 +74,7 @@ export function Header() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`text-base transition-colors hover:text-accent ${active ? "text-accent" : "text-page-fg"}`}
+                  className={`whitespace-nowrap transition-colors hover:text-accent ${active ? "text-accent" : "text-page-fg"}`}
                 >
                   {t.nav[link.key]}
                 </Link>
@@ -72,8 +82,8 @@ export function Header() {
             })}
           </nav>
 
-          <div className="flex shrink-0 items-center gap-1.5 sm:gap-3">
-            <ThemeSwitcher />
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+            <ThemeSwitcher className="hidden sm:inline-flex" />
             <div className="hidden rounded-full border border-line p-0.5 text-xs font-bold tracking-[0.12em] sm:flex">
               {(["ka", "en"] as const).map((code) => (
                 <button
@@ -87,15 +97,46 @@ export function Header() {
                 </button>
               ))}
             </div>
-            <Link
-              href="/contact"
-              className="hidden rounded-full bg-accent px-4 py-2 text-sm font-medium text-accent-fg xl:inline-flex"
-            >
-              {t.nav.contact}
-            </Link>
+            {user ? (
+              <>
+                <Link
+                  href="/profile"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-line text-page-fg transition-colors hover:border-accent hover:text-accent sm:h-10 sm:w-auto sm:gap-2 sm:px-3.5"
+                  aria-label={t.nav.profile}
+                >
+                  <UserRound className="h-4 w-4" strokeWidth={2} />
+                  <span className="hidden max-w-[8rem] truncate xl:inline">
+                    {t.nav.profile}
+                  </span>
+                </Link>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="hidden h-9 w-9 items-center justify-center rounded-full border border-line text-page-fg transition-colors hover:border-accent hover:text-accent xl:inline-flex sm:h-10 sm:w-10"
+                  aria-label={t.nav.logout}
+                >
+                  <LogOut className="h-4 w-4" strokeWidth={2} />
+                </button>
+              </>
+            ) : (
+              <div className="flex items-center gap-2 sm:gap-3">
+                <Link
+                  href="/login"
+                  className="whitespace-nowrap text-sm text-page-fg transition-colors hover:text-accent"
+                >
+                  {t.nav.login}
+                </Link>
+                <Link
+                  href="/register"
+                  className="inline-flex rounded-full bg-accent px-3 py-2 text-sm font-medium text-accent-fg"
+                >
+                  {t.nav.register}
+                </Link>
+              </div>
+            )}
             <button
               type="button"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-line sm:h-10 sm:w-10 lg:hidden"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-line sm:h-10 sm:w-10 xl:hidden"
               aria-expanded={open}
               aria-label={open ? t.menu.close : t.menu.open}
               onClick={() => setOpen((value) => !value)}
@@ -112,7 +153,7 @@ export function Header() {
       <AnimatePresence>
         {open ? (
           <motion.div
-            className="fixed inset-0 z-50 flex flex-col bg-page text-page-fg lg:hidden"
+            className="fixed inset-0 z-50 flex flex-col bg-page text-page-fg xl:hidden"
             initial={reduce ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={reduce ? undefined : { opacity: 0 }}
@@ -129,21 +170,29 @@ export function Header() {
               </button>
             </div>
             <div className="shell flex items-center justify-between gap-3 border-b border-line py-3 sm:hidden">
-              <p className="text-xs font-bold uppercase tracking-[0.14em] text-fg-muted">
-                {t.menu.language}
-              </p>
-              <div className="flex rounded-full border border-line p-0.5 text-xs font-bold tracking-[0.12em]">
-                {(["ka", "en"] as const).map((code) => (
-                  <button
-                    key={code}
-                    type="button"
-                    onClick={() => setLocale(code)}
-                    className={`rounded-full px-3 py-1.5 uppercase transition-colors ${locale === code ? "bg-accent text-accent-fg" : "text-page-fg"}`}
-                    aria-pressed={locale === code}
-                  >
-                    {code}
-                  </button>
-                ))}
+              <div className="flex items-center gap-3">
+                <p className="text-xs font-bold uppercase tracking-[0.14em] text-fg-muted">
+                  {t.theme.label}
+                </p>
+                <ThemeSwitcher />
+              </div>
+              <div className="flex items-center gap-3">
+                <p className="text-xs font-bold uppercase tracking-[0.14em] text-fg-muted">
+                  {t.menu.language}
+                </p>
+                <div className="flex rounded-full border border-line p-0.5 text-xs font-bold tracking-[0.12em]">
+                  {(["ka", "en"] as const).map((code) => (
+                    <button
+                      key={code}
+                      type="button"
+                      onClick={() => setLocale(code)}
+                      className={`rounded-full px-3 py-1.5 uppercase transition-colors ${locale === code ? "bg-accent text-accent-fg" : "text-page-fg"}`}
+                      aria-pressed={locale === code}
+                    >
+                      {code}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
             <nav
@@ -171,6 +220,25 @@ export function Header() {
                   </Link>
                 </motion.div>
               ))}
+              {user ? (
+                <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                  <Link
+                    href="/profile"
+                    onClick={() => setOpen(false)}
+                    className="inline-flex items-center justify-center rounded-full border border-line px-5 py-3 text-sm font-medium"
+                  >
+                    {t.nav.profile}
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-5 py-3 text-sm font-medium text-accent-fg"
+                  >
+                    <LogOut className="h-4 w-4" strokeWidth={2} />
+                    {t.nav.logout}
+                  </button>
+                </div>
+              ) : null}
             </nav>
           </motion.div>
         ) : null}

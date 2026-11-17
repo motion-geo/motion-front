@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useLocale, usePageTitle } from "./locale";
 import { Mark } from "./logo";
 import { Reveal } from "./reveal";
@@ -49,24 +50,40 @@ export function PartnersPage() {
         </p>
       </header>
       <div className="shell grid grid-cols-2 gap-3 pb-20 sm:grid-cols-3 md:pb-28 lg:grid-cols-4">
-        {partnerFaces.map((face, index) => (
-          <Reveal key={face.bg + index}>
-            <article
-              className="flex aspect-[4/3] flex-col justify-between rounded-[1.5rem] p-4 sm:p-5"
-              style={{ background: face.bg, color: face.fg }}
-            >
-              <div className="flex items-start justify-end gap-2">
-                <SampleBadge label={t.sample} />
-              </div>
-              <div className="flex items-end justify-between gap-3">
-                <p className="text-xs font-medium leading-snug">
-                  {t.partners.slot}
-                </p>
-                <Mark className="h-10 w-12 shrink-0 sm:h-12 sm:w-14" />
-              </div>
-            </article>
-          </Reveal>
-        ))}
+        {t.partners.items.map((partner, index) => {
+          const face = partnerFaces[partner.id] ?? {
+            bg: "#141414",
+            fg: "#FFFFFF",
+          };
+          return (
+            <Reveal key={partner.id} delay={index * 0.03}>
+              <Link
+                href={`/partners/${partner.id}`}
+                aria-label={`${t.partners.open}: ${partner.name}`}
+                className="group flex aspect-[4/3] flex-col justify-between rounded-[1.5rem] p-4 transition-transform duration-300 hover:scale-[1.02] sm:p-5"
+                style={{ background: face.bg, color: face.fg }}
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.14em] opacity-80">
+                    {partner.role}
+                  </p>
+                  <SampleBadge label={t.sample} />
+                </div>
+                <div className="flex items-end justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="truncate text-base font-bold sm:text-lg">
+                      {partner.name}
+                    </p>
+                    <p className="mt-1 line-clamp-2 text-xs leading-snug opacity-80">
+                      {partner.summary}
+                    </p>
+                  </div>
+                  <Mark className="h-10 w-12 shrink-0 transition-transform duration-300 group-hover:translate-x-0.5 sm:h-12 sm:w-14" />
+                </div>
+              </Link>
+            </Reveal>
+          );
+        })}
       </div>
     </div>
   );

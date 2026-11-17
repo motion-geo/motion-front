@@ -1,6 +1,13 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useSyncExternalStore,
+} from "react";
 import { en } from "@/content/en";
 import { ka } from "@/content/ka";
 import type { Dictionary, Locale } from "@/content/types";
@@ -15,21 +22,52 @@ type LocaleContextValue = {
 
 const LocaleContext = createContext<LocaleContextValue | null>(null);
 
-export function LocaleProvider({ children }: { children: React.ReactNode }) {
-  const [locale, setLocale] = useState<Locale>("ka");
-  const [ready, setReady] = useState(false);
+const listeners = new Set<() => void>();
 
-  useEffect(() => {
-    const saved = window.localStorage.getItem(STORAGE_KEY);
-    if (saved === "en" || saved === "ka") setLocale(saved);
-    setReady(true);
+function emit() {
+  listeners.forEach((listener) => listener());
+}
+
+function subscribe(listener: () => void) {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
+}
+
+function isLocale(value: string | null): value is Locale {
+  return value === "ka" || value === "en";
+}
+
+function getLocaleSnapshot(): Locale {
+  const saved = window.localStorage.getItem(STORAGE_KEY);
+  return isLocale(saved) ? saved : "ka";
+}
+
+function getServerLocaleSnapshot(): Locale {
+  return "ka";
+}
+
+function applyLocale(locale: Locale) {
+  window.localStorage.setItem(STORAGE_KEY, locale);
+  document.documentElement.lang = locale;
+  emit();
+}
+
+export function LocaleProvider({ children }: { children: React.ReactNode }) {
+  const locale = useSyncExternalStore(
+    subscribe,
+    getLocaleSnapshot,
+    getServerLocaleSnapshot,
+  );
+
+  const setLocale = useCallback((next: Locale) => {
+    applyLocale(next);
   }, []);
 
   useEffect(() => {
-    if (!ready) return;
     document.documentElement.lang = locale;
-    window.localStorage.setItem(STORAGE_KEY, locale);
-  }, [locale, ready]);
+  }, [locale]);
 
   const value = useMemo<LocaleContextValue>(
     () => ({
@@ -37,7 +75,7 @@ export function LocaleProvider({ children }: { children: React.ReactNode }) {
       setLocale,
       t: locale === "ka" ? ka : en,
     }),
-    [locale],
+    [locale, setLocale],
   );
 
   return (

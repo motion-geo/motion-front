@@ -59,34 +59,6 @@
   --service-6: #ff0000;
 }
 
-[data-theme="custom"] {
-  --page: #000000;
-  --page-fg: #ffffff;
-  --panel: #ffffff;
-  --panel-fg: #141414;
-  --muted: #e8e8e8;
-  --muted-fg: #141414;
-  --band: #c8f902;
-  --band-fg: #000000;
-  --accent: #c8f902;
-  --accent-fg: #000000;
-  --brand: #015f3a;
-  --line: rgba(255, 255, 255, 0.18);
-  --header: rgba(0, 0, 0, 0.9);
-  --soft: rgba(255, 255, 255, 0.06);
-  --fg-muted: #b3b3b3;
-  --selection: #c8f902;
-  --selection-fg: #000000;
-  --card: #ffffff;
-  --card-fg: #141414;
-  --service-1: #ff8500;
-  --service-2: #015f3a;
-  --service-3: #fe725b;
-  --service-4: #004b70;
-  --service-5: #820099;
-  --service-6: #ff0000;
-}
-
 @layer base {
   html {
     background: var(--page);
@@ -198,25 +170,21 @@ html.theme-animating *::after {
   }
 }
 
-.react-colorful {
-  width: 100%;
+.auth-input {
+  background: color-mix(in srgb, var(--page-fg) 7%, var(--page));
 }
 
-.react-colorful__saturation {
-  border-radius: 0.85rem;
-  border-bottom: none;
+.auth-input:focus {
+  background: color-mix(in srgb, var(--page-fg) 10%, var(--page));
 }
 
-.react-colorful__hue {
-  margin-top: 0.65rem;
-  height: 0.7rem;
-  border-radius: 999px;
+.auth-input:-webkit-autofill,
+.auth-input:-webkit-autofill:hover,
+.auth-input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--page-fg);
+  caret-color: var(--page-fg);
+  box-shadow: 0 0 0 1000px color-mix(in srgb, var(--page-fg) 7%, var(--page))
+    inset;
+  transition: background-color 9999s ease-in-out 0s;
 }
 
-.react-colorful__saturation-pointer,
-.react-colorful__hue-pointer {
-  width: 1rem;
-  height: 1rem;
-  border: 2px solid #fff;
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
-}

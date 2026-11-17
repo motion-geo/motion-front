@@ -2,15 +2,16 @@
 
 import { useMemo, useState } from "react";
 import { useLocale, usePageTitle } from "./locale";
-import { Mark } from "./logo";
 import { Reveal } from "./reveal";
-import { SampleBadge, SectionLabel } from "./section-label";
-import { workFaces } from "./work-styles";
+import { SectionLabel } from "./section-label";
+import { VideoLightbox, type LightboxWork } from "./video-lightbox";
+import { WorkCard } from "./work-card";
 
 export function WorksPage() {
   const { t } = useLocale();
   usePageTitle(`${t.nav.works} · Motion`);
   const [filter, setFilter] = useState("all");
+  const [active, setActive] = useState<LightboxWork | null>(null);
 
   const filters = useMemo(() => {
     const used = new Set(t.works.items.map((item) => item.serviceId));
@@ -55,39 +56,33 @@ export function WorksPage() {
 
         <div className="mt-8 grid gap-4 pb-8 sm:grid-cols-2 md:pb-16 xl:grid-cols-3">
           {visible.map((item) => {
-            const face = workFaces[item.id];
             const service = t.services.items.find(
               (entry) => entry.id === item.serviceId,
             );
             return (
               <Reveal key={item.id}>
-                <article className="flex h-full flex-col overflow-hidden rounded-[1.7rem] border border-line bg-soft text-page-fg">
-                  <div
-                    className="relative aspect-[4/3] p-5"
-                    style={{ background: face.bg, color: face.fg }}
-                  >
-                    <div className="flex items-start justify-end gap-3">
-                      <SampleBadge label={t.sample} />
-                    </div>
-                    <Mark className="absolute bottom-4 right-4 h-14 w-16" />
-                  </div>
-                  <div className="flex flex-1 flex-col p-5">
-                    <p className="text-xs font-bold uppercase tracking-[0.16em] text-brand">
-                      {service?.name}
-                    </p>
-                    <h2 className="mt-2 text-2xl font-bold leading-tight">
-                      {item.title}
-                    </h2>
-                    <p className="mt-3 text-sm leading-relaxed text-fg-muted">
-                      {item.summary}
-                    </p>
-                  </div>
-                </article>
+                <WorkCard
+                  item={item}
+                  serviceName={service?.name}
+                  sampleLabel={t.sample}
+                  playLabel={t.works.play}
+                  openLabel={t.works.open}
+                  videoLabel={t.works.video}
+                  photoLabel={t.works.photo}
+                  onOpen={setActive}
+                />
               </Reveal>
             );
           })}
         </div>
       </div>
+
+      <VideoLightbox
+        work={active}
+        onClose={() => setActive(null)}
+        closeLabel={t.works.closePlayer}
+        photoLabel={t.works.photo}
+      />
     </div>
   );
 }
