@@ -154,7 +154,7 @@ export const ka: Dictionary = {
         id: "brand",
         name: "Brand Studio",
         price: "4 500 ₾",
-        period: "/ პროექტი",
+        period: "/ თვე",
         summary: "იდენტობა და ვიზუალური სისტემა ახალი ან განახლებული ბრენდისთვის.",
         features: [
           "ლოგო და გამოყენების წესები",
@@ -182,7 +182,7 @@ export const ka: Dictionary = {
         id: "video",
         name: "Video Pack",
         price: "3 900 ₾",
-        period: "/ პროექტი",
+        period: "/ თვე",
         summary: "მოკლე ფილმი ან რეკლამის კრეატივი იდეიდან მონტაჟამდე.",
         features: [
           "სცენარი და შოტლისტი",

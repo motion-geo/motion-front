@@ -156,7 +156,7 @@ export const en: Dictionary = {
         id: "brand",
         name: "Brand Studio",
         price: "4,500 ₾",
-        period: "/ project",
+        period: "/ month",
         summary: "Identity and visual system for a new or refreshed brand.",
         features: [
           "Logo and usage rules",
@@ -184,7 +184,7 @@ export const en: Dictionary = {
         id: "video",
         name: "Video Pack",
         price: "3,900 ₾",
-        period: "/ project",
+        period: "/ month",
         summary: "A short film or ad creative from idea to edit.",
         features: [
           "Script and shot list",

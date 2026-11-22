@@ -1,13 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { Check } from "lucide-react";
 import { useLocale, usePageTitle } from "./locale";
+import { PlanCard } from "./plan-card";
 import { Reveal } from "./reveal";
-import { SampleBadge, SectionLabel } from "./section-label";
+import { SectionLabel } from "./section-label";
+import { usePlans } from "./use-plans";
 
 export function PlansPage() {
   const { t } = useLocale();
+  const { items: plans } = usePlans();
   usePageTitle(`${t.nav.plans} · Motion`);
 
   return (
@@ -27,67 +29,9 @@ export function PlansPage() {
         </header>
 
         <div className="mt-12 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {t.plans.items.map((plan, index) => (
+          {plans.map((plan, index) => (
             <Reveal key={plan.id} delay={index * 0.04}>
-              <article
-                className={`flex h-full flex-col rounded-[1.7rem] border p-6 sm:p-7 ${
-                  plan.featured
-                    ? "border-accent bg-accent text-accent-fg"
-                    : "border-line bg-soft text-page-fg"
-                }`}
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <h2 className="text-2xl font-bold">{plan.name}</h2>
-                    <p
-                      className={`mt-2 text-sm leading-relaxed ${
-                        plan.featured ? "text-accent-fg/75" : "text-fg-muted"
-                      }`}
-                    >
-                      {plan.summary}
-                    </p>
-                  </div>
-                  <SampleBadge label={t.sample} />
-                </div>
-
-                <div className="mt-8 flex items-end gap-2">
-                  <span className="text-4xl font-bold tracking-tight">
-                    {plan.price}
-                  </span>
-                  <span
-                    className={`pb-1 text-sm ${
-                      plan.featured ? "text-accent-fg/70" : "text-fg-muted"
-                    }`}
-                  >
-                    {plan.period}
-                  </span>
-                </div>
-
-                <ul className="mt-8 flex-1 space-y-3">
-                  {plan.features.map((feature) => (
-                    <li key={feature} className="flex gap-3 text-sm leading-snug">
-                      <Check
-                        className={`mt-0.5 h-4 w-4 shrink-0 ${
-                          plan.featured ? "text-accent-fg" : "text-accent"
-                        }`}
-                        strokeWidth={2.5}
-                      />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <Link
-                  href="/contact"
-                  className={`mt-8 inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-medium transition-transform hover:scale-[1.02] ${
-                    plan.featured
-                      ? "bg-page text-page-fg"
-                      : "bg-accent text-accent-fg"
-                  }`}
-                >
-                  {t.plans.choose}
-                </Link>
-              </article>
+              <PlanCard plan={plan} chooseLabel={t.plans.choose} />
             </Reveal>
           ))}
         </div>

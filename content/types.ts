@@ -32,11 +32,20 @@ export type TermSection = {
   body: string;
 };
 
+export type PlanPricingTier = {
+  unit: "day" | "week" | "month" | "year";
+  quantity: number;
+  price: string;
+  period: string;
+};
+
 export type Plan = {
   id: string;
   name: string;
   price: string;
   period: string;
+  /** Multi-tier pricing from API; static fallback may omit this. */
+  pricing?: PlanPricingTier[];
   summary: string;
   features: string[];
   featured?: boolean;

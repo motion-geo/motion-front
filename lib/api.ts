@@ -73,3 +73,40 @@ export async function apiFetchServices(): Promise<ApiService[]> {
   if (!res.ok) await parseError(res);
   return res.json() as Promise<ApiService[]>;
 }
+
+export type ApiPlanPricingTier = {
+  unit: "day" | "week" | "month" | "year";
+  quantity: number;
+  price: string;
+};
+
+export type ApiPlan = {
+  id: string;
+  slug: string;
+  nameKa: string;
+  nameEn: string;
+  summaryKa: string;
+  summaryEn: string;
+  pricing: ApiPlanPricingTier[];
+  featuresKa: string[];
+  featuresEn: string[];
+  featured: boolean;
+  isPublic: boolean;
+  allowedUserIds: string[];
+  sortOrder: number;
+};
+
+export async function apiFetchPlans(): Promise<ApiPlan[]> {
+  const res = await fetch(`${API_URL}/plans`, { cache: "no-store" });
+  if (!res.ok) await parseError(res);
+  return res.json() as Promise<ApiPlan[]>;
+}
+
+export async function apiFetchPlansForMe(token: string): Promise<ApiPlan[]> {
+  const res = await fetch(`${API_URL}/plans/for-me`, {
+    cache: "no-store",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) await parseError(res);
+  return res.json() as Promise<ApiPlan[]>;
+}

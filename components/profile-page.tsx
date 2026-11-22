@@ -8,6 +8,7 @@ import { useLocale, usePageTitle } from "./locale";
 import { Reveal } from "./reveal";
 import { SampleBadge, SectionLabel } from "./section-label";
 import { VideoLightbox, type LightboxWork } from "./video-lightbox";
+import { usePlans } from "./use-plans";
 import { useServices } from "./use-services";
 import { WorkCard } from "./work-card";
 
@@ -15,6 +16,7 @@ export function ProfilePage() {
   const { t } = useLocale();
   const { user } = useAuth();
   const { items: services } = useServices();
+  const { items: plans } = usePlans();
   const router = useRouter();
   const [active, setActive] = useState<LightboxWork | null>(null);
 
@@ -25,8 +27,8 @@ export function ProfilePage() {
   }, [user, router]);
 
   const plan = useMemo(
-    () => t.plans.items.find((item) => item.id === user?.planId) ?? null,
-    [t.plans.items, user?.planId],
+    () => plans.find((item) => item.id === user?.planId) ?? null,
+    [plans, user?.planId],
   );
 
   const works = useMemo(() => {
