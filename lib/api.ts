@@ -54,3 +54,22 @@ export async function apiRegister(input: {
   if (!res.ok) await parseError(res);
   return res.json() as Promise<AuthResponse>;
 }
+
+export type ApiService = {
+  id: string;
+  slug: string;
+  nameKa: string;
+  nameEn: string;
+  summaryKa: string;
+  summaryEn: string;
+  icon: string;
+  iconSvg: string | null;
+  color: string;
+  sortOrder: number;
+};
+
+export async function apiFetchServices(): Promise<ApiService[]> {
+  const res = await fetch(`${API_URL}/services`, { cache: "no-store" });
+  if (!res.ok) await parseError(res);
+  return res.json() as Promise<ApiService[]>;
+}

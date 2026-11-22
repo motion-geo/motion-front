@@ -4,19 +4,21 @@ import { useMemo, useState } from "react";
 import { useLocale, usePageTitle } from "./locale";
 import { Reveal } from "./reveal";
 import { SectionLabel } from "./section-label";
+import { useServices } from "./use-services";
 import { VideoLightbox, type LightboxWork } from "./video-lightbox";
 import { WorkCard } from "./work-card";
 
 export function WorksPage() {
   const { t } = useLocale();
+  const { items: services } = useServices();
   usePageTitle(`${t.nav.works} · Motion`);
   const [filter, setFilter] = useState("all");
   const [active, setActive] = useState<LightboxWork | null>(null);
 
   const filters = useMemo(() => {
     const used = new Set(t.works.items.map((item) => item.serviceId));
-    return t.services.items.filter((item) => used.has(item.id));
-  }, [t]);
+    return services.filter((item) => used.has(item.id));
+  }, [t.works.items, services]);
 
   const visible =
     filter === "all"
@@ -56,7 +58,7 @@ export function WorksPage() {
 
         <div className="mt-8 grid gap-4 pb-8 sm:grid-cols-2 md:pb-16 xl:grid-cols-3">
           {visible.map((item) => {
-            const service = t.services.items.find(
+            const service = services.find(
               (entry) => entry.id === item.serviceId,
             );
             return (

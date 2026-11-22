@@ -1,12 +1,12 @@
 "use client";
 
 import { useReducedMotion } from "motion/react";
-import { useLocale } from "./locale";
+import { useServices } from "./use-services";
 
 export function Marquee() {
-  const { t } = useLocale();
+  const { items } = useServices();
   const reduce = useReducedMotion();
-  const names = t.services.items.map((item) => item.name);
+  const names = items.map((item) => item.name);
   const loop = reduce ? names : [...names, ...names];
 
   return (

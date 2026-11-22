@@ -8,11 +8,13 @@ import { Mark } from "./logo";
 import { Reveal } from "./reveal";
 import { SampleBadge, SectionLabel } from "./section-label";
 import { VideoLightbox, type LightboxWork } from "./video-lightbox";
+import { useServices } from "./use-services";
 import { WorkCard } from "./work-card";
 import { partnerFaces } from "./work-styles";
 
 export function PartnerDetailPage({ partnerId }: { partnerId: string }) {
   const { t } = useLocale();
+  const { items: services } = useServices();
   const partner = t.partners.items.find((item) => item.id === partnerId);
   const [active, setActive] = useState<LightboxWork | null>(null);
 
@@ -137,7 +139,7 @@ export function PartnerDetailPage({ partnerId }: { partnerId: string }) {
           </div>
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {works.map((item, index) => {
-              const service = t.services.items.find(
+              const service = services.find(
                 (entry) => entry.id === item.serviceId,
               );
               return (

@@ -8,11 +8,13 @@ import { useLocale, usePageTitle } from "./locale";
 import { Reveal } from "./reveal";
 import { SampleBadge, SectionLabel } from "./section-label";
 import { VideoLightbox, type LightboxWork } from "./video-lightbox";
+import { useServices } from "./use-services";
 import { WorkCard } from "./work-card";
 
 export function ProfilePage() {
   const { t } = useLocale();
   const { user } = useAuth();
+  const { items: services } = useServices();
   const router = useRouter();
   const [active, setActive] = useState<LightboxWork | null>(null);
 
@@ -132,7 +134,7 @@ export function ProfilePage() {
           {works.length > 0 ? (
             <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {works.map((item, index) => {
-                const service = t.services.items.find(
+                const service = services.find(
                   (entry) => entry.id === item.serviceId,
                 );
                 return (

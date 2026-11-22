@@ -4,6 +4,9 @@ export type Service = {
   id: string;
   name: string;
   summary: string;
+  icon?: string;
+  iconSvg?: string | null;
+  color?: string;
 };
 
 export type WorkItem = {

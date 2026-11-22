@@ -6,10 +6,12 @@ import { Mark } from "./logo";
 import { Reveal } from "./reveal";
 import { SampleBadge, SectionLabel } from "./section-label";
 import { ServiceGrid } from "./service-grid";
+import { useServices } from "./use-services";
 import { partnerFaces } from "./work-styles";
 
 export function ServicesPage() {
   const { t } = useLocale();
+  const { items } = useServices();
   usePageTitle(`${t.nav.services} · Motion`);
 
   return (
@@ -28,7 +30,7 @@ export function ServicesPage() {
         </p>
       </header>
       <div className="shell relative pb-20 md:pb-28">
-        <ServiceGrid items={t.services.items} detailed />
+        <ServiceGrid items={items} detailed />
       </div>
     </div>
   );

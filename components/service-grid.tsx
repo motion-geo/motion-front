@@ -6,18 +6,22 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import type { Service } from "@/content/types";
 import { ServiceIcon } from "./service-icons";
 
-const accents = [
-  "var(--service-1)",
-  "var(--service-2)",
-  "var(--service-3)",
-  "var(--service-4)",
-  "var(--service-5)",
-  "var(--service-6)",
+const fallbackAccents = [
+  "#ff8500",
+  "#015f3a",
+  "#fe725b",
+  "#004b70",
+  "#820099",
+  "#ff0000",
 ] as const;
 
 /** Lime disappears on white — use a darker lime, not brand green. */
 function accentOnLight(color: string) {
   return color.toLowerCase() === "#c8f902" ? "#6B8A00" : color;
+}
+
+function serviceColor(item: Service, index: number) {
+  return item.color || fallbackAccents[index % fallbackAccents.length];
 }
 
 export function ServiceGrid({
@@ -30,13 +34,21 @@ export function ServiceGrid({
   const reduce = useReducedMotion();
   const [active, setActive] = useState(0);
   const current = items[active] ?? items[0];
-  const accent = accentOnLight(accents[active % accents.length]);
+  const accent = current
+    ? accentOnLight(serviceColor(current, active))
+    : fallbackAccents[0];
+
+  if (!items.length) {
+    return (
+      <p className="text-sm text-fg-muted">სერვისები ჯერ არ არის ხელმისაწვდომი.</p>
+    );
+  }
 
   if (!detailed) {
     return (
       <ul className="space-y-2 sm:space-y-3">
         {items.map((item, index) => {
-          const color = accents[index % accents.length];
+          const color = serviceColor(item, index);
 
           return (
             <li key={item.id} id={item.id} className="scroll-mt-28">
@@ -64,6 +76,8 @@ export function ServiceGrid({
                   >
                     <ServiceIcon
                       id={item.id}
+                      icon={item.icon}
+                      iconSvg={item.iconSvg}
                       className="h-5 w-5 sm:h-7 sm:w-7"
                     />
                   </span>
@@ -107,7 +121,12 @@ export function ServiceGrid({
                 className="flex h-20 w-20 items-center justify-center rounded-[1.4rem]"
                 style={{ background: `${accent}22`, color: accent }}
               >
-                <ServiceIcon id={current.id} className="h-10 w-10" />
+                <ServiceIcon
+                  id={current.id}
+                  icon={current.icon}
+                  iconSvg={current.iconSvg}
+                  className="h-10 w-10"
+                />
               </span>
               <h2 className="mt-6 max-w-md text-3xl font-bold leading-[1.05] xl:text-4xl">
                 {current.name}
@@ -128,7 +147,7 @@ export function ServiceGrid({
 
       <ul className="space-y-2">
         {items.map((item, index) => {
-          const color = accents[index % accents.length];
+          const color = serviceColor(item, index);
           const isActive = active === index;
           const lightColor = accentOnLight(color);
 
@@ -161,15 +180,13 @@ export function ServiceGrid({
                 />
                 <span className="flex items-start gap-4 sm:gap-5">
                   <span
-                    className={`mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border sm:h-12 sm:w-12 ${
-                      isActive
-                        ? "border-line bg-soft"
-                        : "border-line bg-soft"
-                    }`}
+                    className="mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-line bg-soft sm:h-12 sm:w-12"
                     style={{ color: isActive ? lightColor : color }}
                   >
                     <ServiceIcon
                       id={item.id}
+                      icon={item.icon}
+                      iconSvg={item.iconSvg}
                       className="h-5 w-5 sm:h-6 sm:w-6"
                     />
                   </span>

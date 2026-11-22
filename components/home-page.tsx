@@ -9,12 +9,14 @@ import { Marquee } from "./marquee";
 import { Reveal } from "./reveal";
 import { SampleBadge, SectionLabel } from "./section-label";
 import { ServiceGrid } from "./service-grid";
+import { useServices } from "./use-services";
 import { VideoLightbox, type LightboxWork } from "./video-lightbox";
 import { WorkCard } from "./work-card";
 import { partnerFaces } from "./work-styles";
 
 export function HomePage() {
   const { t } = useLocale();
+  const { items: services } = useServices();
   usePageTitle(t.meta.title);
   const preview = t.works.items.slice(0, 3);
   const [active, setActive] = useState<LightboxWork | null>(null);
@@ -133,7 +135,7 @@ export function HomePage() {
               <span aria-hidden>→</span>
             </Link>
           </Reveal>
-          <ServiceGrid items={t.services.items} />
+          <ServiceGrid items={services} />
         </div>
       </section>
 
@@ -156,7 +158,7 @@ export function HomePage() {
           </Reveal>
           <div className="grid gap-4 md:grid-cols-3">
             {preview.map((item, index) => {
-              const service = t.services.items.find(
+              const service = services.find(
                 (entry) => entry.id === item.serviceId,
               );
               return (
