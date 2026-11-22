@@ -435,7 +435,7 @@ export const en: Dictionary = {
     nameOrCompany: "Full name or company",
     password: "Password",
     confirmPassword: "Repeat password",
-    note: "This form is a prototype and is not sent to a server.",
+    note: "Your account is stored on the Motion server.",
     again: "Back to the form",
     required: "Fill in this field",
     emailInvalid: "That email format is not valid",
@@ -444,6 +444,7 @@ export const en: Dictionary = {
     passwordMismatch: "Passwords do not match",
     toLogin: "Already have an account? Log in",
     toRegister: "No account yet? Sign up",
+    formError: "The request failed. Please try again.",
   },
   profile: {
     label: "Profile",

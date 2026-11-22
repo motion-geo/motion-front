@@ -1,0 +1,56 @@
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ||
+  "http://localhost:4000";
+
+export type ApiUser = {
+  id: string;
+  email: string;
+  phone: string;
+  nameOrCompany: string;
+  role: "user" | "admin";
+  planId: string;
+  workIds: string[];
+};
+
+export type AuthResponse = {
+  accessToken: string;
+  user: ApiUser;
+};
+
+async function parseError(res: Response) {
+  const data = (await res.json().catch(() => ({}))) as {
+    message?: string | string[];
+  };
+  const message = Array.isArray(data.message)
+    ? data.message.join(", ")
+    : data.message || "Request failed";
+  throw new Error(message);
+}
+
+export async function apiLogin(
+  email: string,
+  password: string,
+): Promise<AuthResponse> {
+  const res = await fetch(`${API_URL}/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+  if (!res.ok) await parseError(res);
+  return res.json() as Promise<AuthResponse>;
+}
+
+export async function apiRegister(input: {
+  email: string;
+  phone: string;
+  nameOrCompany: string;
+  password: string;
+}): Promise<AuthResponse> {
+  const res = await fetch(`${API_URL}/auth/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  if (!res.ok) await parseError(res);
+  return res.json() as Promise<AuthResponse>;
+}

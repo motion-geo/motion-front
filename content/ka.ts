@@ -434,7 +434,7 @@ export const ka: Dictionary = {
     nameOrCompany: "სახელი გვარი ან კომპანია",
     password: "პაროლი",
     confirmPassword: "გაიმეორეთ პაროლი",
-    note: "ფორმა პროტოტიპია და სერვერზე არ იგზავნება.",
+    note: "ანგარიში ინახება Motion სერვერზე.",
     again: "ფორმაზე დაბრუნება",
     required: "შეავსეთ ეს ველი",
     emailInvalid: "იმეილის ფორმატი არასწორია",
@@ -443,6 +443,7 @@ export const ka: Dictionary = {
     passwordMismatch: "პაროლები არ ემთხვევა",
     toLogin: "უკვე გაქვს ანგარიში? შესვლა",
     toRegister: "არ გაქვს ანგარიში? რეგისტრაცია",
+    formError: "მოთხოვნა ვერ შესრულდა. სცადე თავიდან.",
   },
   profile: {
     label: "პროფილი",

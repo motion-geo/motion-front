@@ -7,28 +7,32 @@ import {
   useMemo,
   useSyncExternalStore,
 } from "react";
+import { apiLogin, apiRegister } from "@/lib/api";
 
 const SESSION_KEY = "motion-auth-session";
-const USERS_KEY = "motion-auth-users";
+const TOKEN_KEY = "motion-auth-token";
 
 export type AuthUser = {
+  id: string;
   email: string;
   phone: string;
   nameOrCompany: string;
+  role: "user" | "admin";
   planId: string;
   workIds: string[];
 };
 
 type AuthContextValue = {
   user: AuthUser | null;
+  token: string | null;
   ready: boolean;
-  login: (input: { email: string; password: string }) => AuthUser;
+  login: (input: { email: string; password: string }) => Promise<AuthUser>;
   register: (input: {
     email: string;
     phone: string;
     nameOrCompany: string;
     password: string;
-  }) => AuthUser;
+  }) => Promise<AuthUser>;
   logout: () => void;
 };
 
@@ -47,29 +51,16 @@ function subscribe(listener: () => void) {
   };
 }
 
-function readUsers(): Record<string, AuthUser> {
-  try {
-    const raw = window.localStorage.getItem(USERS_KEY);
-    if (!raw) return {};
-    const parsed = JSON.parse(raw) as Record<string, AuthUser>;
-    return parsed && typeof parsed === "object" ? parsed : {};
-  } catch {
-    return {};
-  }
-}
-
-function writeUsers(users: Record<string, AuthUser>) {
-  window.localStorage.setItem(USERS_KEY, JSON.stringify(users));
-}
-
 let cachedSessionRaw: string | null | undefined;
 let cachedSession: AuthUser | null = null;
+let cachedToken: string | null = null;
 
 function readSession(): AuthUser | null {
   try {
     const raw = window.localStorage.getItem(SESSION_KEY);
     if (raw === cachedSessionRaw) return cachedSession;
     cachedSessionRaw = raw;
+    cachedToken = window.localStorage.getItem(TOKEN_KEY);
     if (!raw) {
       cachedSession = null;
       return cachedSession;
@@ -80,20 +71,25 @@ function readSession(): AuthUser | null {
   } catch {
     cachedSessionRaw = null;
     cachedSession = null;
+    cachedToken = null;
     return null;
   }
 }
 
-function writeSession(user: AuthUser | null) {
-  if (user) {
+function writeSession(user: AuthUser | null, token: string | null = null) {
+  if (user && token) {
     const raw = JSON.stringify(user);
     window.localStorage.setItem(SESSION_KEY, raw);
+    window.localStorage.setItem(TOKEN_KEY, token);
     cachedSessionRaw = raw;
     cachedSession = user;
+    cachedToken = token;
   } else {
     window.localStorage.removeItem(SESSION_KEY);
+    window.localStorage.removeItem(TOKEN_KEY);
     cachedSessionRaw = null;
     cachedSession = null;
+    cachedToken = null;
   }
   emit();
 }
@@ -102,56 +98,28 @@ function getServerSnapshot(): AuthUser | null {
   return null;
 }
 
-function demoUserFromEmail(email: string): AuthUser {
-  const local = email.split("@")[0] || "client";
-  const name = local
-    .replace(/[._-]+/g, " ")
-    .replace(/\b\w/g, (char) => char.toUpperCase());
-
-  return {
-    email,
-    phone: "555123456",
-    nameOrCompany: name || "Motion Client",
-    planId: "growth",
-    workIds: ["identity", "rhythm", "film"],
-  };
-}
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const user = useSyncExternalStore(subscribe, readSession, getServerSnapshot);
 
-  const login = useCallback((input: { email: string; password: string }) => {
-    void input.password;
-    const email = input.email.trim().toLowerCase();
-    const users = readUsers();
-    const existing = users[email] ?? demoUserFromEmail(email);
-    users[email] = existing;
-    writeUsers(users);
-    writeSession(existing);
-    return existing;
-  }, []);
+  const login = useCallback(
+    async (input: { email: string; password: string }) => {
+      const result = await apiLogin(input.email, input.password);
+      writeSession(result.user, result.accessToken);
+      return result.user;
+    },
+    [],
+  );
 
   const register = useCallback(
-    (input: {
+    async (input: {
       email: string;
       phone: string;
       nameOrCompany: string;
       password: string;
     }) => {
-      void input.password;
-      const email = input.email.trim().toLowerCase();
-      const next: AuthUser = {
-        email,
-        phone: input.phone.trim(),
-        nameOrCompany: input.nameOrCompany.trim(),
-        planId: "growth",
-        workIds: ["identity", "rhythm", "search"],
-      };
-      const users = readUsers();
-      users[email] = next;
-      writeUsers(users);
-      writeSession(next);
-      return next;
+      const result = await apiRegister(input);
+      writeSession(result.user, result.accessToken);
+      return result.user;
     },
     [],
   );
@@ -163,6 +131,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo<AuthContextValue>(
     () => ({
       user,
+      token: user ? cachedToken : null,
       ready: true,
       login,
       register,

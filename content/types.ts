@@ -164,6 +164,7 @@ export type Dictionary = {
     passwordMismatch: string;
     toLogin: string;
     toRegister: string;
+    formError: string;
   };
   profile: {
     label: string;

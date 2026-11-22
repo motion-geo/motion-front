@@ -29,12 +29,14 @@ export function LoginPage() {
   const router = useRouter();
   usePageTitle(`${t.nav.login} · Motion`);
   const [errors, setErrors] = useState<LoginErrors>({});
+  const [formError, setFormError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (user) router.replace("/profile");
   }, [user, router]);
 
-  function onSubmit(event: FormEvent<HTMLFormElement>) {
+  async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const email = String(data.get("email") ?? "").trim();
@@ -47,10 +49,20 @@ export function LoginPage() {
     else if (password.length < 6) next.password = t.auth.passwordShort;
 
     setErrors(next);
+    setFormError("");
     if (Object.keys(next).length > 0) return;
 
-    login({ email, password });
-    router.push("/profile");
+    setLoading(true);
+    try {
+      await login({ email, password });
+      router.push("/profile");
+    } catch (error) {
+      setFormError(
+        error instanceof Error ? error.message : t.auth.formError,
+      );
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -76,9 +88,15 @@ export function LoginPage() {
           autoComplete="current-password"
           error={errors.password}
         />
+        {formError ? (
+          <p className="rounded-2xl border border-motion-red/40 bg-motion-red/10 px-4 py-3 text-sm text-motion-red">
+            {formError}
+          </p>
+        ) : null}
         <button
           type="submit"
-          className="mt-2 inline-flex w-full items-center justify-center rounded-full bg-accent px-6 py-3.5 text-sm font-semibold text-accent-fg transition-transform hover:scale-[1.015]"
+          disabled={loading}
+          className="mt-2 inline-flex w-full items-center justify-center rounded-full bg-accent px-6 py-3.5 text-sm font-semibold text-accent-fg transition-transform hover:scale-[1.015] disabled:opacity-60"
         >
           {t.auth.loginSubmit}
         </button>
@@ -96,12 +114,14 @@ export function RegisterPage() {
   const router = useRouter();
   usePageTitle(`${t.nav.register} · Motion`);
   const [errors, setErrors] = useState<RegisterErrors>({});
+  const [formError, setFormError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (user) router.replace("/profile");
   }, [user, router]);
 
-  function onSubmit(event: FormEvent<HTMLFormElement>) {
+  async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const email = String(data.get("email") ?? "").trim();
@@ -124,10 +144,20 @@ export function RegisterPage() {
     }
 
     setErrors(next);
+    setFormError("");
     if (Object.keys(next).length > 0) return;
 
-    register({ email, phone, nameOrCompany, password });
-    router.push("/profile");
+    setLoading(true);
+    try {
+      await register({ email, phone, nameOrCompany, password });
+      router.push("/profile");
+    } catch (error) {
+      setFormError(
+        error instanceof Error ? error.message : t.auth.formError,
+      );
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -179,9 +209,15 @@ export function RegisterPage() {
             error={errors.confirmPassword}
           />
         </div>
+        {formError ? (
+          <p className="rounded-2xl border border-motion-red/40 bg-motion-red/10 px-4 py-3 text-sm text-motion-red">
+            {formError}
+          </p>
+        ) : null}
         <button
           type="submit"
-          className="mt-2 inline-flex w-full items-center justify-center rounded-full bg-accent px-6 py-3.5 text-sm font-semibold text-accent-fg transition-transform hover:scale-[1.015]"
+          disabled={loading}
+          className="mt-2 inline-flex w-full items-center justify-center rounded-full bg-accent px-6 py-3.5 text-sm font-semibold text-accent-fg transition-transform hover:scale-[1.015] disabled:opacity-60"
         >
           {t.auth.registerSubmit}
         </button>
