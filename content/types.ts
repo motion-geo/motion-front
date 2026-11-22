@@ -23,8 +23,12 @@ export type Partner = {
   summary: string;
   about: string;
   focus: string[];
+  /** Selected service slugs from API; static fallback may omit. */
+  serviceSlugs?: string[];
   workIds: string[];
   since: string;
+  colorBg?: string;
+  colorFg?: string;
 };
 
 export type TermSection = {

@@ -110,3 +110,36 @@ export async function apiFetchPlansForMe(token: string): Promise<ApiPlan[]> {
   if (!res.ok) await parseError(res);
   return res.json() as Promise<ApiPlan[]>;
 }
+
+export type ApiPartner = {
+  id: string;
+  slug: string;
+  nameKa: string;
+  nameEn: string;
+  roleKa: string;
+  roleEn: string;
+  summaryKa: string;
+  summaryEn: string;
+  aboutKa: string;
+  aboutEn: string;
+  serviceSlugs: string[];
+  since: string;
+  colorBg: string;
+  colorFg: string;
+  userId: string | null;
+  sortOrder: number;
+};
+
+export async function apiFetchPartners(): Promise<ApiPartner[]> {
+  const res = await fetch(`${API_URL}/partners`, { cache: "no-store" });
+  if (!res.ok) await parseError(res);
+  return res.json() as Promise<ApiPartner[]>;
+}
+
+export async function apiFetchPartner(slug: string): Promise<ApiPartner> {
+  const res = await fetch(`${API_URL}/partners/${encodeURIComponent(slug)}`, {
+    cache: "no-store",
+  });
+  if (!res.ok) await parseError(res);
+  return res.json() as Promise<ApiPartner>;
+}

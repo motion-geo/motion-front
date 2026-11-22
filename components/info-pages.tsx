@@ -4,8 +4,9 @@ import Link from "next/link";
 import { useLocale, usePageTitle } from "./locale";
 import { Mark } from "./logo";
 import { Reveal } from "./reveal";
-import { SampleBadge, SectionLabel } from "./section-label";
+import { SectionLabel } from "./section-label";
 import { ServiceGrid } from "./service-grid";
+import { usePartners } from "./use-partners";
 import { useServices } from "./use-services";
 import { partnerFaces } from "./work-styles";
 
@@ -38,6 +39,7 @@ export function ServicesPage() {
 
 export function PartnersPage() {
   const { t } = useLocale();
+  const { items: partners } = usePartners();
   usePageTitle(`${t.nav.partners} · Motion`);
 
   return (
@@ -52,10 +54,10 @@ export function PartnersPage() {
         </p>
       </header>
       <div className="shell grid grid-cols-2 gap-3 pb-20 sm:grid-cols-3 md:pb-28 lg:grid-cols-4">
-        {t.partners.items.map((partner, index) => {
-          const face = partnerFaces[partner.id] ?? {
-            bg: "#141414",
-            fg: "#FFFFFF",
+        {partners.map((partner, index) => {
+          const face = {
+            bg: partner.colorBg ?? partnerFaces[partner.id]?.bg ?? "#141414",
+            fg: partner.colorFg ?? partnerFaces[partner.id]?.fg ?? "#FFFFFF",
           };
           return (
             <Reveal key={partner.id} delay={index * 0.03}>
@@ -69,7 +71,6 @@ export function PartnersPage() {
                   <p className="text-[10px] font-bold uppercase tracking-[0.14em] opacity-80">
                     {partner.role}
                   </p>
-                  <SampleBadge label={t.sample} />
                 </div>
                 <div className="flex items-end justify-between gap-3">
                   <div className="min-w-0">

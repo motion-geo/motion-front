@@ -1,35 +1,70 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft } from "lucide-react";
+import type { Partner } from "@/content/types";
+import { loadPartner } from "@/lib/partners";
 import { useLocale, usePageTitle } from "./locale";
 import { Mark } from "./logo";
 import { Reveal } from "./reveal";
-import { SampleBadge, SectionLabel } from "./section-label";
+import { SectionLabel } from "./section-label";
 import { VideoLightbox, type LightboxWork } from "./video-lightbox";
 import { useServices } from "./use-services";
 import { WorkCard } from "./work-card";
 import { partnerFaces } from "./work-styles";
 
 export function PartnerDetailPage({ partnerId }: { partnerId: string }) {
-  const { t } = useLocale();
+  const { locale, t } = useLocale();
   const { items: services } = useServices();
-  const partner = t.partners.items.find((item) => item.id === partnerId);
+  const fallback = t.partners.items.find((item) => item.id === partnerId);
+  const [partner, setPartner] = useState<Partner | null>(fallback ?? null);
+  const [loading, setLoading] = useState(true);
   const [active, setActive] = useState<LightboxWork | null>(null);
 
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    loadPartner(partnerId, locale, services).then((row) => {
+      if (cancelled) return;
+      setPartner(row ?? fallback ?? null);
+      setLoading(false);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [partnerId, locale, services, fallback]);
+
   const works = useMemo(() => {
-    if (!partner) return [];
+    if (!partner?.workIds?.length) return [];
     return partner.workIds
       .map((id) => t.works.items.find((item) => item.id === id))
       .filter((item): item is NonNullable<typeof item> => Boolean(item));
   }, [partner, t.works.items]);
+
+  const focusLabels = useMemo(() => {
+    if (!partner) return [];
+    if (partner.serviceSlugs?.length) {
+      return partner.serviceSlugs
+        .map((slug) => services.find((service) => service.id === slug)?.name)
+        .filter((name): name is string => Boolean(name));
+    }
+    return partner.focus;
+  }, [partner, services]);
 
   usePageTitle(
     partner
       ? `${partner.name} · ${t.nav.partners} · Motion`
       : `${t.partners.notFound} · Motion`,
   );
+
+  if (loading && !partner) {
+    return (
+      <div className="bg-page text-page-fg">
+        <div className="shell py-20 text-fg-muted">…</div>
+      </div>
+    );
+  }
 
   if (!partner) {
     return (
@@ -48,7 +83,10 @@ export function PartnerDetailPage({ partnerId }: { partnerId: string }) {
     );
   }
 
-  const face = partnerFaces[partner.id] ?? { bg: "#141414", fg: "#FFFFFF" };
+  const face = {
+    bg: partner.colorBg ?? partnerFaces[partner.id]?.bg ?? "#141414",
+    fg: partner.colorFg ?? partnerFaces[partner.id]?.fg ?? "#FFFFFF",
+  };
 
   return (
     <div className="bg-page text-page-fg">
@@ -71,7 +109,6 @@ export function PartnerDetailPage({ partnerId }: { partnerId: string }) {
                 <p className="text-xs font-bold uppercase tracking-[0.16em] opacity-80">
                   {partner.role}
                 </p>
-                <SampleBadge label={t.sample} />
               </div>
               <div className="flex items-end justify-between gap-4">
                 <div>
@@ -116,7 +153,7 @@ export function PartnerDetailPage({ partnerId }: { partnerId: string }) {
         <section className="mt-12 md:mt-16">
           <SectionLabel>{t.partners.focusLabel}</SectionLabel>
           <div className="mt-5 flex flex-wrap gap-2">
-            {partner.focus.map((item) => (
+            {focusLabels.map((item) => (
               <span
                 key={item}
                 className="rounded-full border border-line px-4 py-2 text-sm text-page-fg"
@@ -137,27 +174,31 @@ export function PartnerDetailPage({ partnerId }: { partnerId: string }) {
               {t.cta.works} →
             </Link>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {works.map((item, index) => {
-              const service = services.find(
-                (entry) => entry.id === item.serviceId,
-              );
-              return (
-                <Reveal key={item.id} delay={index * 0.05}>
-                  <WorkCard
-                    item={item}
-                    serviceName={service?.name}
-                    sampleLabel={t.sample}
-                    playLabel={t.works.play}
-                    openLabel={t.works.open}
-                    videoLabel={t.works.video}
-                    photoLabel={t.works.photo}
-                    onOpen={setActive}
-                  />
-                </Reveal>
-              );
-            })}
-          </div>
+          {works.length > 0 ? (
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {works.map((item, index) => {
+                const service = services.find(
+                  (entry) => entry.id === item.serviceId,
+                );
+                return (
+                  <Reveal key={item.id} delay={index * 0.05}>
+                    <WorkCard
+                      item={item}
+                      serviceName={service?.name}
+                      sampleLabel={t.sample}
+                      playLabel={t.works.play}
+                      openLabel={t.works.open}
+                      videoLabel={t.works.video}
+                      photoLabel={t.works.photo}
+                      onOpen={setActive}
+                    />
+                  </Reveal>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="text-sm text-fg-muted">{t.profile.noWorks}</p>
+          )}
         </section>
       </div>
 

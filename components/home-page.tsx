@@ -9,6 +9,7 @@ import { Marquee } from "./marquee";
 import { Reveal } from "./reveal";
 import { SampleBadge, SectionLabel } from "./section-label";
 import { ServiceGrid } from "./service-grid";
+import { usePartners } from "./use-partners";
 import { useServices } from "./use-services";
 import { VideoLightbox, type LightboxWork } from "./video-lightbox";
 import { WorkCard } from "./work-card";
@@ -17,6 +18,7 @@ import { partnerFaces } from "./work-styles";
 export function HomePage() {
   const { t } = useLocale();
   const { items: services } = useServices();
+  const { items: partners } = usePartners();
   usePageTitle(t.meta.title);
   const preview = t.works.items.slice(0, 3);
   const [active, setActive] = useState<LightboxWork | null>(null);
@@ -216,10 +218,10 @@ export function HomePage() {
             </Link>
           </Reveal>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {t.partners.items.slice(0, 4).map((partner) => {
-              const face = partnerFaces[partner.id] ?? {
-                bg: "#141414",
-                fg: "#FFFFFF",
+            {partners.slice(0, 4).map((partner) => {
+              const face = {
+                bg: partner.colorBg ?? partnerFaces[partner.id]?.bg ?? "#141414",
+                fg: partner.colorFg ?? partnerFaces[partner.id]?.fg ?? "#FFFFFF",
               };
               return (
                 <Link
