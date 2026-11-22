@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import type { WorkItem } from "@/content/types";
+import { loadWorksForMe, workServiceLabels } from "@/lib/works";
 import { useAuth } from "./auth";
 import { useLocale, usePageTitle } from "./locale";
 import { Reveal } from "./reveal";
@@ -13,12 +15,13 @@ import { useServices } from "./use-services";
 import { WorkCard } from "./work-card";
 
 export function ProfilePage() {
-  const { t } = useLocale();
-  const { user } = useAuth();
+  const { locale, t } = useLocale();
+  const { user, token } = useAuth();
   const { items: services } = useServices();
   const { items: plans } = usePlans();
   const router = useRouter();
   const [active, setActive] = useState<LightboxWork | null>(null);
+  const [works, setWorks] = useState<WorkItem[]>([]);
 
   usePageTitle(`${t.nav.profile} · Motion`);
 
@@ -26,15 +29,36 @@ export function ProfilePage() {
     if (!user) router.replace("/login");
   }, [user, router]);
 
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+
+    if (token) {
+      loadWorksForMe(token, locale).then((rows) => {
+        if (cancelled) return;
+        if (rows.length) {
+          setWorks(rows);
+          return;
+        }
+        setWorks(
+          t.works.items.filter((item) => user.workIds.includes(item.id)),
+        );
+      });
+    } else {
+      setWorks(
+        t.works.items.filter((item) => user.workIds.includes(item.id)),
+      );
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user, token, locale, t.works.items]);
+
   const plan = useMemo(
     () => plans.find((item) => item.id === user?.planId) ?? null,
     [plans, user?.planId],
   );
-
-  const works = useMemo(() => {
-    if (!user) return [];
-    return t.works.items.filter((item) => user.workIds.includes(item.id));
-  }, [t.works.items, user]);
 
   if (!user) {
     return (
@@ -135,25 +159,17 @@ export function ProfilePage() {
 
           {works.length > 0 ? (
             <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              {works.map((item, index) => {
-                const service = services.find(
-                  (entry) => entry.id === item.serviceId,
-                );
-                return (
-                  <Reveal key={item.id} delay={index * 0.04}>
-                    <WorkCard
-                      item={item}
-                      serviceName={service?.name}
-                      sampleLabel={t.sample}
-                      playLabel={t.works.play}
-                      openLabel={t.works.open}
-                      videoLabel={t.works.video}
-                      photoLabel={t.works.photo}
-                      onOpen={setActive}
-                    />
-                  </Reveal>
-                );
-              })}
+              {works.map((item, index) => (
+                <Reveal key={item.id} delay={index * 0.04}>
+                  <WorkCard
+                    item={item}
+                    serviceName={workServiceLabels(item, services)}
+                    playLabel={t.works.play}
+                    openLabel={t.works.open}
+                    onOpen={setActive}
+                  />
+                </Reveal>
+              ))}
             </div>
           ) : (
             <p className="mt-8 text-fg-muted">{t.profile.noWorks}</p>

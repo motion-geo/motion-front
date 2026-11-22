@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { X } from "lucide-react";
@@ -12,24 +12,20 @@ export type LightboxWork = {
   title: string;
   summary: string;
   serviceName?: string;
-  media:
-    | { type: "video"; src: string }
-    | { type: "photo" };
+  coverUrl?: string | null;
+  youtubeEmbedUrl?: string | null;
 };
 
 export function VideoLightbox({
   work,
   onClose,
   closeLabel,
-  photoLabel,
 }: {
   work: LightboxWork | null;
   onClose: () => void;
   closeLabel: string;
-  photoLabel?: string;
 }) {
   const reduce = useReducedMotion();
-  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     if (!work) return;
@@ -41,12 +37,6 @@ export function VideoLightbox({
     }
     window.addEventListener("keydown", onKey);
 
-    const video = videoRef.current;
-    if (video && work.media.type === "video") {
-      video.currentTime = 0;
-      video.play().catch(() => undefined);
-    }
-
     return () => {
       document.body.style.overflow = previous;
       window.removeEventListener("keydown", onKey);
@@ -55,7 +45,9 @@ export function VideoLightbox({
 
   if (typeof document === "undefined") return null;
 
-  const face = work ? workFaces[work.id] ?? { bg: "#141414", fg: "#FFFFFF" } : null;
+  const face = work
+    ? (workFaces[work.id] ?? { bg: "#141414", fg: "#FFFFFF" })
+    : null;
 
   return createPortal(
     <AnimatePresence>
@@ -106,26 +98,27 @@ export function VideoLightbox({
             </div>
 
             <div className="relative bg-black">
-              {work.media.type === "video" ? (
-                <>
-                  <video
-                    ref={videoRef}
+              {work.youtubeEmbedUrl ? (
+                <div className="aspect-video w-full">
+                  <iframe
                     key={work.id}
-                    src={work.media.src}
-                    className="aspect-video w-full object-contain"
-                    controls
-                    playsInline
-                    autoPlay
-                    preload="auto"
+                    src={`${work.youtubeEmbedUrl}?autoplay=1`}
+                    title={work.title}
+                    className="h-full w-full border-0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
                   />
-                  <div
-                    aria-hidden
-                    className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/35 to-transparent"
-                  />
-                </>
+                </div>
+              ) : work.coverUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={work.coverUrl}
+                  alt=""
+                  className="aspect-[4/3] w-full object-cover sm:aspect-video"
+                />
               ) : (
                 <div
-                  className="relative flex aspect-[4/3] w-full items-end justify-between p-6 sm:aspect-video sm:p-8"
+                  className="relative flex aspect-[4/3] w-full items-end justify-end p-6 sm:aspect-video sm:p-8"
                   style={{ background: face?.bg, color: face?.fg }}
                 >
                   <div
@@ -137,13 +130,6 @@ export function VideoLightbox({
                     }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/10" />
-                  {photoLabel ? (
-                    <span className="relative z-10 rounded-full bg-black/45 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-white backdrop-blur-sm">
-                      {photoLabel}
-                    </span>
-                  ) : (
-                    <span />
-                  )}
                   <Mark className="relative z-10 h-16 w-20 sm:h-20 sm:w-24" />
                 </div>
               )}

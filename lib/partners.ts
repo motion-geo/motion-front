@@ -12,6 +12,7 @@ export function mapApiPartner(
 
   return {
     id: item.slug,
+    apiId: item.id,
     name: locale === "ka" ? item.nameKa : item.nameEn,
     role: locale === "ka" ? item.roleKa : item.roleEn,
     summary: locale === "ka" ? item.summaryKa : item.summaryEn,

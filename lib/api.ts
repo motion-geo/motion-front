@@ -143,3 +143,53 @@ export async function apiFetchPartner(slug: string): Promise<ApiPartner> {
   if (!res.ok) await parseError(res);
   return res.json() as Promise<ApiPartner>;
 }
+
+export type ApiWork = {
+  id: string;
+  slug: string;
+  titleKa: string;
+  titleEn: string;
+  summaryKa: string;
+  summaryEn: string;
+  serviceSlugs: string[];
+  partnerId: string | null;
+  userId: string | null;
+  showOnWorks: boolean;
+  showOnPartner: boolean;
+  coverPath: string | null;
+  youtubeUrl: string | null;
+  youtubeEmbedUrl: string | null;
+  sortOrder: number;
+};
+
+export function mediaUrl(path: string | null | undefined): string | null {
+  if (!path) return null;
+  if (/^https?:\/\//i.test(path)) return path;
+  return `${API_URL}${path.startsWith("/") ? "" : "/"}${path}`;
+}
+
+export async function apiFetchWorks(): Promise<ApiWork[]> {
+  const res = await fetch(`${API_URL}/works`, { cache: "no-store" });
+  if (!res.ok) await parseError(res);
+  return res.json() as Promise<ApiWork[]>;
+}
+
+export async function apiFetchWorksByPartner(
+  partnerId: string,
+): Promise<ApiWork[]> {
+  const res = await fetch(
+    `${API_URL}/works/by-partner/${encodeURIComponent(partnerId)}`,
+    { cache: "no-store" },
+  );
+  if (!res.ok) await parseError(res);
+  return res.json() as Promise<ApiWork[]>;
+}
+
+export async function apiFetchWorksForMe(token: string): Promise<ApiWork[]> {
+  const res = await fetch(`${API_URL}/works/for-me`, {
+    cache: "no-store",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) await parseError(res);
+  return res.json() as Promise<ApiWork[]>;
+}

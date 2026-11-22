@@ -11,13 +11,19 @@ export type Service = {
 
 export type WorkItem = {
   id: string;
+  /** Primary service for filters / fallback cards. */
   serviceId: string;
+  serviceSlugs?: string[];
   title: string;
   summary: string;
+  coverUrl?: string | null;
+  youtubeEmbedUrl?: string | null;
 };
 
 export type Partner = {
   id: string;
+  /** Backend UUID when loaded from API. */
+  apiId?: string;
   name: string;
   role: string;
   summary: string;

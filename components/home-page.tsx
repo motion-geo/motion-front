@@ -10,6 +10,8 @@ import { Reveal } from "./reveal";
 import { SampleBadge, SectionLabel } from "./section-label";
 import { ServiceGrid } from "./service-grid";
 import { usePartners } from "./use-partners";
+import { useWorks } from "./use-works";
+import { workServiceLabels } from "@/lib/works";
 import { useServices } from "./use-services";
 import { VideoLightbox, type LightboxWork } from "./video-lightbox";
 import { WorkCard } from "./work-card";
@@ -19,8 +21,9 @@ export function HomePage() {
   const { t } = useLocale();
   const { items: services } = useServices();
   const { items: partners } = usePartners();
+  const { items: works } = useWorks();
   usePageTitle(t.meta.title);
-  const preview = t.works.items.slice(0, 3);
+  const preview = works.slice(0, 3);
   const [active, setActive] = useState<LightboxWork | null>(null);
 
   return (
@@ -159,26 +162,18 @@ export function HomePage() {
             </Link>
           </Reveal>
           <div className="grid gap-4 md:grid-cols-3">
-            {preview.map((item, index) => {
-              const service = services.find(
-                (entry) => entry.id === item.serviceId,
-              );
-              return (
-                <Reveal key={item.id} delay={index * 0.06}>
-                  <WorkCard
-                    item={item}
-                    serviceName={service?.name}
-                    sampleLabel={t.sample}
-                    playLabel={t.works.play}
-                    openLabel={t.works.open}
-                    videoLabel={t.works.video}
-                    photoLabel={t.works.photo}
-                    onOpen={setActive}
-                    showSummary={false}
-                  />
-                </Reveal>
-              );
-            })}
+            {preview.map((item, index) => (
+              <Reveal key={item.id} delay={index * 0.06}>
+                <WorkCard
+                  item={item}
+                  serviceName={workServiceLabels(item, services)}
+                  playLabel={t.works.play}
+                  openLabel={t.works.open}
+                  onOpen={setActive}
+                  showSummary={false}
+                />
+              </Reveal>
+            ))}
           </div>
         </div>
       </section>
@@ -266,7 +261,6 @@ export function HomePage() {
         work={active}
         onClose={() => setActive(null)}
         closeLabel={t.works.closePlayer}
-        photoLabel={t.works.photo}
       />
     </>
   );

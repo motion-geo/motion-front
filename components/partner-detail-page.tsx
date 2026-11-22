@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft } from "lucide-react";
-import type { Partner } from "@/content/types";
+import type { Partner, WorkItem } from "@/content/types";
 import { loadPartner } from "@/lib/partners";
+import { loadWorksByPartner, workServiceLabels } from "@/lib/works";
 import { useLocale, usePageTitle } from "./locale";
 import { Mark } from "./logo";
 import { Reveal } from "./reveal";
@@ -19,28 +20,37 @@ export function PartnerDetailPage({ partnerId }: { partnerId: string }) {
   const { items: services } = useServices();
   const fallback = t.partners.items.find((item) => item.id === partnerId);
   const [partner, setPartner] = useState<Partner | null>(fallback ?? null);
+  const [works, setWorks] = useState<WorkItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [active, setActive] = useState<LightboxWork | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    loadPartner(partnerId, locale, services).then((row) => {
+    loadPartner(partnerId, locale, services).then(async (row) => {
       if (cancelled) return;
-      setPartner(row ?? fallback ?? null);
+      const next = row ?? fallback ?? null;
+      setPartner(next);
+
+      if (next?.apiId) {
+        const apiWorks = await loadWorksByPartner(next.apiId, locale);
+        if (cancelled) return;
+        setWorks(apiWorks);
+      } else if (next?.workIds?.length) {
+        setWorks(
+          next.workIds
+            .map((id) => t.works.items.find((item) => item.id === id))
+            .filter((item): item is WorkItem => Boolean(item)),
+        );
+      } else {
+        setWorks([]);
+      }
       setLoading(false);
     });
     return () => {
       cancelled = true;
     };
-  }, [partnerId, locale, services, fallback]);
-
-  const works = useMemo(() => {
-    if (!partner?.workIds?.length) return [];
-    return partner.workIds
-      .map((id) => t.works.items.find((item) => item.id === id))
-      .filter((item): item is NonNullable<typeof item> => Boolean(item));
-  }, [partner, t.works.items]);
+  }, [partnerId, locale, services, fallback, t.works.items]);
 
   const focusLabels = useMemo(() => {
     if (!partner) return [];
@@ -176,25 +186,17 @@ export function PartnerDetailPage({ partnerId }: { partnerId: string }) {
           </div>
           {works.length > 0 ? (
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              {works.map((item, index) => {
-                const service = services.find(
-                  (entry) => entry.id === item.serviceId,
-                );
-                return (
-                  <Reveal key={item.id} delay={index * 0.05}>
-                    <WorkCard
-                      item={item}
-                      serviceName={service?.name}
-                      sampleLabel={t.sample}
-                      playLabel={t.works.play}
-                      openLabel={t.works.open}
-                      videoLabel={t.works.video}
-                      photoLabel={t.works.photo}
-                      onOpen={setActive}
-                    />
-                  </Reveal>
-                );
-              })}
+              {works.map((item, index) => (
+                <Reveal key={item.id} delay={index * 0.05}>
+                  <WorkCard
+                    item={item}
+                    serviceName={workServiceLabels(item, services)}
+                    playLabel={t.works.play}
+                    openLabel={t.works.open}
+                    onOpen={setActive}
+                  />
+                </Reveal>
+              ))}
             </div>
           ) : (
             <p className="text-sm text-fg-muted">{t.profile.noWorks}</p>
@@ -206,7 +208,6 @@ export function PartnerDetailPage({ partnerId }: { partnerId: string }) {
         work={active}
         onClose={() => setActive(null)}
         closeLabel={t.works.closePlayer}
-        photoLabel={t.works.photo}
       />
     </div>
   );
