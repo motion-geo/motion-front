@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useLocale, usePageTitle } from "./locale";
 import { SectionLabel } from "./section-label";
+import { useSettings } from "./use-settings";
 
 type Errors = {
   name?: string;
@@ -11,10 +12,15 @@ type Errors = {
 };
 
 export function ContactPage() {
-  const { t } = useLocale();
+  const { locale, t } = useLocale();
+  const { settings } = useSettings();
   usePageTitle(`${t.nav.contact} · Motion`);
   const [sent, setSent] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
+
+  const hasContactInfo = Boolean(
+    settings.phone || settings.email || settings.address,
+  );
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -43,9 +49,54 @@ export function ContactPage() {
           <p className="mt-5 max-w-md text-base leading-relaxed text-fg-muted sm:mt-6 sm:text-lg">
             {t.contact.lead}
           </p>
-          <p className="mt-5 max-w-md border-l-2 border-accent pl-4 text-sm leading-relaxed text-fg-muted sm:mt-6">
-            {t.contact.note}
-          </p>
+          {hasContactInfo ? (
+            <dl className="mt-6 max-w-md space-y-3 text-sm sm:mt-8">
+              {settings.phone ? (
+                <div>
+                  <dt className="text-[11px] font-bold uppercase tracking-[0.14em] text-fg-muted">
+                    {t.contact.phone}
+                  </dt>
+                  <dd className="mt-1">
+                    <a
+                      href={`tel:${settings.phone.replace(/\s+/g, "")}`}
+                      className="text-base font-medium text-page-fg transition-colors hover:text-accent"
+                    >
+                      {settings.phone}
+                    </a>
+                  </dd>
+                </div>
+              ) : null}
+              {settings.email ? (
+                <div>
+                  <dt className="text-[11px] font-bold uppercase tracking-[0.14em] text-fg-muted">
+                    {t.contact.email}
+                  </dt>
+                  <dd className="mt-1">
+                    <a
+                      href={`mailto:${settings.email}`}
+                      className="text-base font-medium text-page-fg transition-colors hover:text-accent"
+                    >
+                      {settings.email}
+                    </a>
+                  </dd>
+                </div>
+              ) : null}
+              {settings.address ? (
+                <div>
+                  <dt className="text-[11px] font-bold uppercase tracking-[0.14em] text-fg-muted">
+                    {locale === "ka" ? "მისამართი" : "Address"}
+                  </dt>
+                  <dd className="mt-1 whitespace-pre-line text-base font-medium text-page-fg">
+                    {settings.address}
+                  </dd>
+                </div>
+              ) : null}
+            </dl>
+          ) : (
+            <p className="mt-5 max-w-md border-l-2 border-accent pl-4 text-sm leading-relaxed text-fg-muted sm:mt-6">
+              {t.contact.note}
+            </p>
+          )}
         </header>
 
         {sent ? (

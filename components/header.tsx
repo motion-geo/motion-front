@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { LogOut, UserRound } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useAuth } from "./auth";
-import { Logo } from "./logo";
+import { BrandLogo } from "./brand-logo";
 import { useLocale } from "./locale";
 import { ThemeSwitcher } from "./theme";
 
@@ -26,16 +26,18 @@ export function Header() {
   const { user, logout } = useAuth();
   const reduce = useReducedMotion();
   const [open, setOpen] = useState(false);
+  const [menuRoute, setMenuRoute] = useState({ pathname, locale });
+
+  if (menuRoute.pathname !== pathname || menuRoute.locale !== locale) {
+    setMenuRoute({ pathname, locale });
+    if (open) setOpen(false);
+  }
 
   function handleLogout() {
     logout();
     setOpen(false);
     router.push("/");
   }
-
-  useEffect(() => {
-    setOpen(false);
-  }, [pathname, locale]);
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -58,7 +60,7 @@ export function Header() {
       <header className="fixed inset-x-0 top-0 z-40 border-b border-line bg-header backdrop-blur-md">
         <div className="shell flex h-16 items-center justify-between gap-2 sm:h-[4.5rem] sm:gap-3">
           <Link href="/" aria-label="Motion" className="min-w-0 shrink">
-            <Logo className="h-9 w-auto max-w-[7.5rem] text-brand sm:h-12 sm:max-w-none" title="" />
+            <BrandLogo className="h-9 w-auto max-w-[7.5rem] text-brand sm:h-12 sm:max-w-none" title="" />
           </Link>
 
           <nav
@@ -160,7 +162,7 @@ export function Header() {
             transition={{ duration: 0.25 }}
           >
             <div className="shell flex h-16 items-center justify-between sm:h-[4.5rem]">
-              <Logo className="h-9 w-auto text-brand sm:h-11" title="" />
+              <BrandLogo className="h-9 w-auto text-brand sm:h-11" title="" />
               <button
                 type="button"
                 className="rounded-full border border-line px-4 py-2 text-sm"

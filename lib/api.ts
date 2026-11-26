@@ -193,3 +193,38 @@ export async function apiFetchWorksForMe(token: string): Promise<ApiWork[]> {
   if (!res.ok) await parseError(res);
   return res.json() as Promise<ApiWork[]>;
 }
+
+export type ApiTermsSection = {
+  titleKa: string;
+  titleEn: string;
+  bodyKa: string;
+  bodyEn: string;
+};
+
+export type ApiSettings = {
+  id: string;
+  phone: string | null;
+  email: string | null;
+  addressKa: string | null;
+  addressEn: string | null;
+  instagramUrl: string | null;
+  facebookUrl: string | null;
+  linkedinUrl: string | null;
+  youtubeUrl: string | null;
+  heroVideoPath: string | null;
+  reelVideoPath: string | null;
+  logoPath: string | null;
+  faviconPath: string | null;
+  ogImagePath: string | null;
+  termsTitleKa: string;
+  termsTitleEn: string;
+  termsLeadKa: string;
+  termsLeadEn: string;
+  termsSections: ApiTermsSection[];
+};
+
+export async function apiFetchSettings(): Promise<ApiSettings> {
+  const res = await fetch(`${API_URL}/settings`, { cache: "no-store" });
+  if (!res.ok) await parseError(res);
+  return res.json() as Promise<ApiSettings>;
+}

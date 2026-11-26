@@ -10,6 +10,7 @@ import { Reveal } from "./reveal";
 import { SampleBadge, SectionLabel } from "./section-label";
 import { ServiceGrid } from "./service-grid";
 import { usePartners } from "./use-partners";
+import { useSettings } from "./use-settings";
 import { useWorks } from "./use-works";
 import { workServiceLabels } from "@/lib/works";
 import { useServices } from "./use-services";
@@ -22,6 +23,7 @@ export function HomePage() {
   const { items: services } = useServices();
   const { items: partners } = usePartners();
   const { items: works } = useWorks();
+  const { settings } = useSettings();
   usePageTitle(t.meta.title);
   const preview = works.slice(0, 3);
   const [active, setActive] = useState<LightboxWork | null>(null);
@@ -61,7 +63,7 @@ export function HomePage() {
             <div className="relative">
               <div className="overflow-hidden rounded-[1.8rem] border border-line bg-panel">
                 <BrandVideo
-                  src="/brand/primary.mp4"
+                  src={settings.heroVideoUrl}
                   className="aspect-video w-full object-contain"
                 />
               </div>
@@ -192,7 +194,7 @@ export function HomePage() {
           <Reveal delay={0.08}>
             <div className="overflow-hidden rounded-[1.8rem] bg-page">
               <BrandVideo
-                src="/brand/secondary.mp4"
+                src={settings.reelVideoUrl}
                 className="aspect-video w-full object-contain"
               />
             </div>

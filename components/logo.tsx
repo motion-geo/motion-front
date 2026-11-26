@@ -1,6 +1,8 @@
 type LogoProps = {
   className?: string;
   title?: string;
+  /** When set, shows uploaded brand logo instead of inline SVG wordmark. */
+  src?: string | null;
 };
 
 const paths = [
@@ -27,8 +29,21 @@ const paths = [
   "m1360.11,164.81l-109.01,64.34c-26.68,15.75-29.78,53.15-6.05,73.07h0c14.58,12.25,35.31,13.96,51.71,4.28l63.36-37.4v206.46l-144.43-121.22-72.96-61.23-6.63-5.56L814.78,17.9l-7.19-6.03c-32.73-27.47-82.63-4.2-82.63,38.52v505.51c0,38.93,42.33,63.1,75.86,43.31l13.96-8.24,318.86-188.21,226.46,190.06,7.19,6.04c32.73,27.47,82.63,4.2,82.63-38.53V199.88c0-38.93-42.33-63.1-75.86-43.31l-13.96,8.24Zm-545.32,321.87V135.16l117.72,98.79,128.19,107.58-245.9,145.14Z",
 ] as const;
 
-export function Logo({ className, title = "Motion" }: LogoProps) {
+export function Logo({ className, title = "Motion", src }: LogoProps) {
   const labelled = title.length > 0;
+
+  if (src) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={src}
+        alt={labelled ? title : ""}
+        aria-hidden={labelled ? undefined : true}
+        className={className}
+      />
+    );
+  }
+
   return (
     <svg
       viewBox="0 0 2174.89 1374.01"

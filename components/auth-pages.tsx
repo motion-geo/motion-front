@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import { useAuth } from "./auth";
-import { Logo, Mark } from "./logo";
+import { BrandLogo } from "./brand-logo";
+import { Mark } from "./logo";
 import { useLocale, usePageTitle } from "./locale";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -260,7 +261,7 @@ function AuthShell({
       <div className="shell relative flex min-h-[calc(100svh-4rem)] items-center justify-center py-10 sm:min-h-[calc(100svh-4.5rem)] sm:py-14">
         <div className="w-full max-w-2xl">
           <div className="mb-6 flex flex-col items-center text-center">
-            <Logo className="h-12 w-auto text-brand sm:h-14" title="" />
+            <BrandLogo className="h-12 w-auto text-brand sm:h-14" title="" />
             <p className="mt-5 text-xs font-bold uppercase tracking-[0.2em] text-accent">
               {label}
             </p>

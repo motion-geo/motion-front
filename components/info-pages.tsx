@@ -8,6 +8,7 @@ import { SectionLabel } from "./section-label";
 import { ServiceGrid } from "./service-grid";
 import { usePartners } from "./use-partners";
 import { useServices } from "./use-services";
+import { useSettings } from "./use-settings";
 import { partnerFaces } from "./work-styles";
 
 export function ServicesPage() {
@@ -94,7 +95,15 @@ export function PartnersPage() {
 
 export function TermsPage() {
   const { t } = useLocale();
+  const { settings } = useSettings();
   usePageTitle(`${t.nav.terms} · Motion`);
+
+  const title = settings.termsTitle || t.terms.title;
+  const lead = settings.termsLead || t.terms.lead;
+  const sections =
+    settings.termsSections.length > 0
+      ? settings.termsSections
+      : t.terms.sections;
 
   return (
     <article className="bg-page text-page-fg">
@@ -102,17 +111,15 @@ export function TermsPage() {
         <header>
           <SectionLabel tone="brand">{t.terms.label}</SectionLabel>
           <h1 className="mt-4 text-[clamp(2.4rem,6vw,4.6rem)] font-bold leading-[0.95]">
-            {t.terms.title}
+            {title}
           </h1>
           <p className="mt-6 inline-flex rounded-full bg-accent px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-accent-fg">
             {t.terms.draft}
           </p>
-          <p className="mt-6 text-lg leading-relaxed text-fg-muted">
-            {t.terms.lead}
-          </p>
+          <p className="mt-6 text-lg leading-relaxed text-fg-muted">{lead}</p>
         </header>
         <ol className="mt-12 space-y-10 pb-8 md:pb-16">
-          {t.terms.sections.map((section) => (
+          {sections.map((section) => (
             <li key={section.title} className="border-t border-line pt-8">
               <h2 className="text-2xl font-bold">{section.title}</h2>
               <p className="mt-3 text-base leading-relaxed text-fg-muted">

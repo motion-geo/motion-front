@@ -21,10 +21,11 @@ export function BrandVideo({
       return;
     }
     video.play().catch(() => undefined);
-  }, [reduce]);
+  }, [reduce, src]);
 
   return (
     <video
+      key={src}
       ref={ref}
       className={className}
       src={src}
