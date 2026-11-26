@@ -228,3 +228,28 @@ export async function apiFetchSettings(): Promise<ApiSettings> {
   if (!res.ok) await parseError(res);
   return res.json() as Promise<ApiSettings>;
 }
+
+/** Cacheable settings read for `generateMetadata` / Cache Components. */
+export async function apiFetchSettingsCached(): Promise<ApiSettings> {
+  const res = await fetch(`${API_URL}/settings`, {
+    next: { revalidate: 60, tags: ["site-settings"] },
+  });
+  if (!res.ok) await parseError(res);
+  return res.json() as Promise<ApiSettings>;
+}
+
+export type ApiSiteText = {
+  id: string;
+  key: string;
+  page: string;
+  valueKa: string;
+  valueEn: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export async function apiFetchTexts(): Promise<ApiSiteText[]> {
+  const res = await fetch(`${API_URL}/texts`, { cache: "no-store" });
+  if (!res.ok) await parseError(res);
+  return res.json() as Promise<ApiSiteText[]>;
+}

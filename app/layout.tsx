@@ -7,7 +7,7 @@ import { Header } from "@/components/header";
 import { LocaleProvider } from "@/components/locale";
 import { ThemeProvider, themeInitScript } from "@/components/theme";
 import { ThemeInitScript } from "@/components/theme-init-script";
-import { apiFetchSettings, mediaUrl } from "@/lib/api";
+import { apiFetchSettingsCached, mediaUrl } from "@/lib/api";
 import "./globals.css";
 
 const noto = Noto_Sans_Georgian({
@@ -29,8 +29,10 @@ const fallbackMeta = {
 };
 
 export async function generateMetadata(): Promise<Metadata> {
+  "use cache";
+
   try {
-    const settings = await apiFetchSettings();
+    const settings = await apiFetchSettingsCached();
     const favicon = mediaUrl(settings.faviconPath);
     const og = mediaUrl(settings.ogImagePath);
     return {

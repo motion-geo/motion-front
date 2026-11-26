@@ -6,11 +6,13 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useState,
   useSyncExternalStore,
 } from "react";
 import { en } from "@/content/en";
 import { ka } from "@/content/ka";
 import type { Dictionary, Locale } from "@/content/types";
+import { loadMergedDictionary } from "@/lib/texts";
 
 const STORAGE_KEY = "motion-locale";
 
@@ -54,12 +56,24 @@ function applyLocale(locale: Locale) {
   emit();
 }
 
+function staticDictionary(locale: Locale): Dictionary {
+  return locale === "ka" ? ka : en;
+}
+
 export function LocaleProvider({ children }: { children: React.ReactNode }) {
   const locale = useSyncExternalStore(
     subscribe,
     getLocaleSnapshot,
     getServerLocaleSnapshot,
   );
+
+  const [t, setT] = useState<Dictionary>(() => staticDictionary(locale));
+  const [activeLocale, setActiveLocale] = useState(locale);
+
+  if (activeLocale !== locale) {
+    setActiveLocale(locale);
+    setT(staticDictionary(locale));
+  }
 
   const setLocale = useCallback((next: Locale) => {
     applyLocale(next);
@@ -69,13 +83,25 @@ export function LocaleProvider({ children }: { children: React.ReactNode }) {
     document.documentElement.lang = locale;
   }, [locale]);
 
+  useEffect(() => {
+    let cancelled = false;
+    const base = staticDictionary(locale);
+    loadMergedDictionary(base, locale).then((merged) => {
+      if (cancelled) return;
+      setT(merged);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [locale]);
+
   const value = useMemo<LocaleContextValue>(
     () => ({
       locale,
       setLocale,
-      t: locale === "ka" ? ka : en,
+      t,
     }),
-    [locale, setLocale],
+    [locale, setLocale, t],
   );
 
   return (
