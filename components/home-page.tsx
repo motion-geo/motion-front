@@ -7,7 +7,7 @@ import { useLocale, usePageTitle } from "./locale";
 import { Mark } from "./logo";
 import { Marquee } from "./marquee";
 import { Reveal } from "./reveal";
-import { SampleBadge, SectionLabel } from "./section-label";
+import { SectionLabel } from "./section-label";
 import { ServiceGrid } from "./service-grid";
 import { usePartners } from "./use-partners";
 import { useSettings } from "./use-settings";
@@ -157,7 +157,7 @@ export function HomePage() {
             </div>
             <Link
               href="/works"
-              className="inline-flex items-center gap-1.5 rounded-full border border-brand/50 px-4 py-1.5 text-xs font-medium text-brand transition-colors hover:bg-brand hover:text-page sm:text-sm"
+              className="inline-flex items-center gap-1.5 rounded-full border border-brand/50 px-4 py-1.5 text-xs font-medium text-brand transition-colors hover:bg-brand hover:text-accent-fg sm:text-sm"
             >
               {t.cta.works}
               <span aria-hidden>→</span>

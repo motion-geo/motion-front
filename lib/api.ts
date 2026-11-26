@@ -111,6 +111,83 @@ export async function apiFetchPlansForMe(token: string): Promise<ApiPlan[]> {
   return res.json() as Promise<ApiPlan[]>;
 }
 
+export type ApiPlanActivation = {
+  id: string;
+  userId: string;
+  userEmail?: string;
+  userName?: string;
+  planId: string;
+  planSlug: string;
+  planNameKa: string;
+  planNameEn: string;
+  periodUnit: "day" | "week" | "month" | "year";
+  periodQuantity: number;
+  priceLabel: string;
+  amountGel: number;
+  status: "test" | "paid" | "failed" | "cancelled";
+  provider: "test" | "bog" | "admin";
+  externalPaymentId: string | null;
+  startsAt: string;
+  endsAt: string;
+  createdAt: string;
+};
+
+export type ApiActivationStats = {
+  totalRevenueGel: number;
+  totalActivations: number;
+  byMonth: Array<{ month: string; revenueGel: number; count: number }>;
+  byYear: Array<{ year: number; revenueGel: number; count: number }>;
+  popularPlans: Array<{
+    planSlug: string;
+    planNameKa: string;
+    planNameEn: string;
+    count: number;
+    revenueGel: number;
+  }>;
+};
+
+export async function apiActivatePlan(
+  token: string,
+  slug: string,
+  input: { unit: string; quantity: number },
+): Promise<ApiPlanActivation> {
+  const res = await fetch(
+    `${API_URL}/plans/${encodeURIComponent(slug)}/activate`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(input),
+    },
+  );
+  if (!res.ok) await parseError(res);
+  return res.json() as Promise<ApiPlanActivation>;
+}
+
+export async function apiFetchMyActivations(
+  token: string,
+): Promise<ApiPlanActivation[]> {
+  const res = await fetch(`${API_URL}/plans/activations/me`, {
+    cache: "no-store",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) await parseError(res);
+  return res.json() as Promise<ApiPlanActivation[]>;
+}
+
+export async function apiCancelMyPlan(
+  token: string,
+): Promise<{ planId: string }> {
+  const res = await fetch(`${API_URL}/plans/activations/me/cancel`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) await parseError(res);
+  return res.json() as Promise<{ planId: string }>;
+}
+
 export type ApiPartner = {
   id: string;
   slug: string;

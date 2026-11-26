@@ -1,20 +1,52 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Check } from "lucide-react";
 import type { Plan } from "@/content/types";
+import { apiActivatePlan } from "@/lib/api";
 import { periodChipLabel } from "@/lib/plan-periods";
+import { useAuth } from "./auth";
 import { useLocale } from "./locale";
-import { SampleBadge } from "./section-label";
-
 export function PlanCard({ plan, chooseLabel }: { plan: Plan; chooseLabel: string }) {
   const { locale, t } = useLocale();
+  const { user, token, updateUser } = useAuth();
+  const router = useRouter();
   const pricing = plan.pricing?.length
     ? plan.pricing
     : [{ unit: "month" as const, quantity: 1, price: plan.price, period: plan.period }];
   const [active, setActive] = useState(0);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
   const selected = pricing[Math.min(active, pricing.length - 1)] ?? pricing[0];
+
+  async function onChoose() {
+    setError("");
+    const unit = selected.unit;
+    const quantity = selected.quantity;
+
+    if (!user || !token) {
+      const params = new URLSearchParams({
+        next: "/plans",
+        plan: plan.id,
+        unit,
+        quantity: String(quantity),
+      });
+      router.push(`/login?${params.toString()}`);
+      return;
+    }
+
+    setBusy(true);
+    try {
+      const row = await apiActivatePlan(token, plan.id, { unit, quantity });
+      updateUser({ planId: row.planSlug });
+      router.push("/profile");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t.auth.formError);
+    } finally {
+      setBusy(false);
+    }
+  }
 
   return (
     <article
@@ -24,18 +56,15 @@ export function PlanCard({ plan, chooseLabel }: { plan: Plan; chooseLabel: strin
           : "border-line bg-soft text-page-fg"
       }`}
     >
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <h2 className="text-2xl font-bold">{plan.name}</h2>
-          <p
-            className={`mt-2 text-sm leading-relaxed ${
-              plan.featured ? "text-accent-fg/75" : "text-fg-muted"
-            }`}
-          >
-            {plan.summary}
-          </p>
-        </div>
-        <SampleBadge label={t.sample} />
+      <div>
+        <h2 className="text-2xl font-bold">{plan.name}</h2>
+        <p
+          className={`mt-2 text-sm leading-relaxed ${
+            plan.featured ? "text-accent-fg/75" : "text-fg-muted"
+          }`}
+        >
+          {plan.summary}
+        </p>
       </div>
 
       {pricing.length > 1 ? (
@@ -89,16 +118,28 @@ export function PlanCard({ plan, chooseLabel }: { plan: Plan; chooseLabel: strin
         ))}
       </ul>
 
-      <Link
-        href="/contact"
-        className={`mt-8 inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-medium transition-transform hover:scale-[1.02] ${
+      {error ? (
+        <p
+          className={`mt-4 text-sm ${
+            plan.featured ? "text-accent-fg" : "text-motion-red"
+          }`}
+        >
+          {error}
+        </p>
+      ) : null}
+
+      <button
+        type="button"
+        disabled={busy}
+        onClick={() => void onChoose()}
+        className={`mt-8 inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-medium transition-transform hover:scale-[1.02] disabled:opacity-60 ${
           plan.featured
             ? "bg-page text-page-fg"
             : "bg-accent text-accent-fg"
         }`}
       >
-        {chooseLabel}
-      </Link>
+        {busy ? "…" : chooseLabel}
+      </button>
     </article>
   );
 }

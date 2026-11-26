@@ -4,11 +4,17 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import type { WorkItem } from "@/content/types";
+import {
+  apiCancelMyPlan,
+  apiFetchMyActivations,
+  type ApiPlanActivation,
+} from "@/lib/api";
+import { periodChipLabel } from "@/lib/plan-periods";
 import { loadWorksForMe, workServiceLabels } from "@/lib/works";
 import { useAuth } from "./auth";
 import { useLocale, usePageTitle } from "./locale";
 import { Reveal } from "./reveal";
-import { SampleBadge, SectionLabel } from "./section-label";
+import { SectionLabel } from "./section-label";
 import { VideoLightbox, type LightboxWork } from "./video-lightbox";
 import { usePlans } from "./use-plans";
 import { useServices } from "./use-services";
@@ -16,12 +22,15 @@ import { WorkCard } from "./work-card";
 
 export function ProfilePage() {
   const { locale, t } = useLocale();
-  const { user, token } = useAuth();
+  const { user, token, updateUser } = useAuth();
   const { items: services } = useServices();
   const { items: plans } = usePlans();
   const router = useRouter();
   const [active, setActive] = useState<LightboxWork | null>(null);
   const [works, setWorks] = useState<WorkItem[]>([]);
+  const [activations, setActivations] = useState<ApiPlanActivation[]>([]);
+  const [cancelling, setCancelling] = useState(false);
+  const [cancelMessage, setCancelMessage] = useState("");
 
   usePageTitle(`${t.nav.profile} · Motion`);
 
@@ -44,6 +53,13 @@ export function ProfilePage() {
           t.works.items.filter((item) => user.workIds.includes(item.id)),
         );
       });
+      apiFetchMyActivations(token)
+        .then((rows) => {
+          if (!cancelled) setActivations(rows);
+        })
+        .catch(() => {
+          if (!cancelled) setActivations([]);
+        });
     } else {
       setWorks(
         t.works.items.filter((item) => user.workIds.includes(item.id)),
@@ -59,6 +75,27 @@ export function ProfilePage() {
     () => plans.find((item) => item.id === user?.planId) ?? null,
     [plans, user?.planId],
   );
+
+  async function onCancelPlan() {
+    if (!token || !user?.planId) return;
+    const confirmed = window.confirm(t.profile.cancelPlanConfirm);
+    if (!confirmed) return;
+    setCancelling(true);
+    setCancelMessage("");
+    try {
+      await apiCancelMyPlan(token);
+      updateUser({ planId: "" });
+      const rows = await apiFetchMyActivations(token);
+      setActivations(rows);
+      setCancelMessage(t.profile.cancelPlanDone);
+    } catch (err) {
+      setCancelMessage(
+        err instanceof Error ? err.message : t.auth.formError,
+      );
+    } finally {
+      setCancelling(false);
+    }
+  }
 
   if (!user) {
     return (
@@ -84,12 +121,9 @@ export function ProfilePage() {
         <div className="mt-12 grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
           <Reveal>
             <section className="rounded-[1.7rem] border border-line bg-soft p-6 sm:p-8">
-              <div className="flex items-start justify-between gap-3">
-                <h2 className="text-xl font-bold sm:text-2xl">
-                  {t.profile.personal}
-                </h2>
-                <SampleBadge label={t.sample} />
-              </div>
+              <h2 className="text-xl font-bold sm:text-2xl">
+                {t.profile.personal}
+              </h2>
               <dl className="mt-8 space-y-5">
                 <InfoRow label={t.auth.nameOrCompany} value={user.nameOrCompany} />
                 <InfoRow label={t.auth.email} value={user.email} />
@@ -100,12 +134,9 @@ export function ProfilePage() {
 
           <Reveal delay={0.05}>
             <section className="flex h-full flex-col rounded-[1.7rem] border border-line bg-soft p-6 sm:p-8">
-              <div className="flex items-start justify-between gap-3">
-                <h2 className="text-xl font-bold sm:text-2xl">
-                  {t.profile.plan}
-                </h2>
-                <SampleBadge label={t.sample} />
-              </div>
+              <h2 className="text-xl font-bold sm:text-2xl">
+                {t.profile.plan}
+              </h2>
               {plan ? (
                 <>
                   <p className="mt-6 text-3xl font-bold tracking-tight">
@@ -131,15 +162,92 @@ export function ProfilePage() {
                   {t.profile.noPlan}
                 </p>
               )}
-              <Link
-                href="/plans"
-                className="mt-auto inline-flex pt-8 text-sm font-medium text-accent transition-colors hover:text-page-fg"
-              >
-                {t.profile.viewPlans}
-              </Link>
+              {cancelMessage ? (
+                <p className="mt-4 text-sm text-fg-muted">{cancelMessage}</p>
+              ) : null}
+              <div className="mt-auto flex flex-wrap items-center gap-4 pt-8">
+                <Link
+                  href="/plans"
+                  className="text-sm font-medium text-accent transition-colors hover:text-page-fg"
+                >
+                  {t.profile.viewPlans}
+                </Link>
+                {user.planId ? (
+                  <button
+                    type="button"
+                    onClick={() => void onCancelPlan()}
+                    disabled={cancelling}
+                    className="rounded-full border border-line px-4 py-2 text-sm font-medium text-fg-muted transition hover:border-page-fg hover:text-page-fg disabled:opacity-50"
+                  >
+                    {cancelling
+                      ? t.profile.cancellingPlan
+                      : t.profile.cancelPlan}
+                  </button>
+                ) : null}
+              </div>
             </section>
           </Reveal>
         </div>
+
+        <section className="mt-12 md:mt-16">
+          <SectionLabel tone="brand">{t.profile.payments}</SectionLabel>
+          <h2 className="mt-3 text-[clamp(1.6rem,3vw,2.4rem)] font-bold leading-tight">
+            {t.profile.paymentsTitle}
+          </h2>
+          {activations.length > 0 ? (
+            <div className="mt-8 grid gap-3">
+              {activations.map((row) => (
+                <article
+                  key={row.id}
+                  className="rounded-[1.4rem] border border-line bg-soft px-5 py-4 sm:px-6"
+                >
+                  <div>
+                    <p className="text-lg font-bold">
+                      {locale === "ka" ? row.planNameKa : row.planNameEn}
+                    </p>
+                    <p className="mt-1 text-sm text-fg-muted">
+                      {new Date(row.createdAt).toLocaleDateString(
+                        locale === "ka" ? "ka-GE" : "en-GB",
+                      )}
+                    </p>
+                  </div>
+                  <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-3">
+                    <div>
+                      <dt className="text-[11px] font-bold uppercase tracking-[0.14em] text-fg-muted">
+                        {t.profile.paymentAmount}
+                      </dt>
+                      <dd className="mt-1 font-medium">{row.priceLabel}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-[11px] font-bold uppercase tracking-[0.14em] text-fg-muted">
+                        {t.profile.paymentPeriod}
+                      </dt>
+                      <dd className="mt-1 font-medium">
+                        {periodChipLabel(
+                          row.periodUnit,
+                          row.periodQuantity,
+                          locale,
+                        )}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-[11px] font-bold uppercase tracking-[0.14em] text-fg-muted">
+                        {t.profile.paymentActiveUntil}
+                      </dt>
+                      <dd className="mt-1 font-medium">
+                        {new Date(row.endsAt).toLocaleDateString(
+                          locale === "ka" ? "ka-GE" : "en-GB",
+                        )}
+                      </dd>
+                    </div>
+                  </dl>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <p className="mt-8 text-fg-muted">{t.profile.paymentsEmpty}</p>
+          )}
+        </section>
 
         <section className="mt-12 md:mt-16">
           <div className="flex flex-wrap items-end justify-between gap-4">

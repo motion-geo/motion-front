@@ -20,11 +20,3 @@ export function SectionLabel({
     </div>
   );
 }
-
-export function SampleBadge({ label }: { label: string }) {
-  return (
-    <span className="inline-flex items-center rounded-full border border-current px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em]">
-      {label}
-    </span>
-  );
-}

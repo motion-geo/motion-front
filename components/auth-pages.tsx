@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { FormEvent, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { FormEvent, useEffect, useRef, useState } from "react";
+import { apiActivatePlan } from "@/lib/api";
 import { useAuth } from "./auth";
 import { BrandLogo } from "./brand-logo";
 import { Mark } from "./logo";
@@ -24,18 +25,54 @@ type RegisterErrors = {
   confirmPassword?: string;
 };
 
+function readPlanResume(params: URLSearchParams) {
+  const plan = params.get("plan")?.trim() || "";
+  const unit = params.get("unit")?.trim() || "";
+  const quantity = Number(params.get("quantity") || "0");
+  if (!plan || !unit || !Number.isFinite(quantity) || quantity < 1) {
+    return null;
+  }
+  return { plan, unit, quantity };
+}
+
 export function LoginPage() {
   const { t } = useLocale();
-  const { user, login } = useAuth();
+  const { user, token, login, updateUser } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
   usePageTitle(`${t.nav.login} · Motion`);
   const [errors, setErrors] = useState<LoginErrors>({});
   const [formError, setFormError] = useState("");
   const [loading, setLoading] = useState(false);
+  const resumeHandled = useRef(false);
+
+  async function finishAfterAuth(accessToken: string) {
+    if (resumeHandled.current) return;
+    resumeHandled.current = true;
+    const resume = readPlanResume(searchParams);
+    const nextPath = searchParams.get("next")?.trim() || "/profile";
+    if (resume) {
+      try {
+        const row = await apiActivatePlan(accessToken, resume.plan, {
+          unit: resume.unit,
+          quantity: resume.quantity,
+        });
+        updateUser({ planId: row.planSlug });
+        router.push("/profile");
+        return;
+      } catch {
+        router.push(nextPath.startsWith("/") ? nextPath : "/plans");
+        return;
+      }
+    }
+    router.push(nextPath.startsWith("/") ? nextPath : "/profile");
+  }
 
   useEffect(() => {
-    if (user) router.replace("/profile");
-  }, [user, router]);
+    if (!user || !token) return;
+    void finishAfterAuth(token);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, token]);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -56,7 +93,7 @@ export function LoginPage() {
     setLoading(true);
     try {
       await login({ email, password });
-      router.push("/profile");
+      // redirect handled by effect with token + query params
     } catch (error) {
       setFormError(
         error instanceof Error ? error.message : t.auth.formError,

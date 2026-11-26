@@ -33,6 +33,7 @@ type AuthContextValue = {
     nameOrCompany: string;
     password: string;
   }) => Promise<AuthUser>;
+  updateUser: (patch: Partial<AuthUser>) => void;
   logout: () => void;
 };
 
@@ -124,6 +125,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [],
   );
 
+  const updateUser = useCallback((patch: Partial<AuthUser>) => {
+    const current = readSession();
+    const token = cachedToken;
+    if (!current || !token) return;
+    writeSession({ ...current, ...patch }, token);
+  }, []);
+
   const logout = useCallback(() => {
     writeSession(null);
   }, []);
@@ -135,9 +143,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       ready: true,
       login,
       register,
+      updateUser,
       logout,
     }),
-    [user, login, register, logout],
+    [user, login, register, updateUser, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

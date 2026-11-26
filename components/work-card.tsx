@@ -82,9 +82,13 @@ export function WorkCard({
           {serviceName}
         </p>
       ) : null}
-      <h2 className="mt-2 text-2xl font-bold leading-tight">{item.title}</h2>
+      <h2 className="mt-2 text-2xl font-bold leading-tight text-card-fg">
+        {item.title}
+      </h2>
       {showSummary ? (
-        <p className="mt-3 text-sm leading-relaxed text-fg-muted">{item.summary}</p>
+        <p className="mt-3 text-sm leading-relaxed text-card-fg/65">
+          {item.summary}
+        </p>
       ) : null}
     </div>
   );
@@ -95,7 +99,7 @@ export function WorkCard({
         type="button"
         onClick={handleOpen}
         aria-label={`${hasYoutube ? playLabel : openLabel}: ${item.title}`}
-        className="group flex h-full w-full flex-col overflow-hidden rounded-[1.7rem] border border-line bg-soft text-left text-page-fg transition-[border-color,transform] duration-300 hover:border-accent"
+        className="group flex h-full w-full flex-col overflow-hidden rounded-[1.7rem] border border-line bg-card text-left text-card-fg transition-[border-color,transform] duration-300 hover:border-accent"
       >
         {mediaBlock}
         {body}
@@ -104,7 +108,7 @@ export function WorkCard({
   }
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-[1.7rem] border border-line bg-soft text-page-fg">
+    <article className="group flex h-full flex-col overflow-hidden rounded-[1.7rem] border border-line bg-card text-card-fg">
       {mediaBlock}
       {body}
     </article>
