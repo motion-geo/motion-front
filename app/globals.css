@@ -59,6 +59,15 @@
   --service-6: #ff0000;
 }
 
+/* Lime on white is unreadable — use deep green inside light panel bands. */
+[data-theme="noir"] .bg-panel {
+  --brand: #015f3a;
+  --accent: #015f3a;
+  --accent-fg: #ffffff;
+  --line: rgba(20, 20, 20, 0.12);
+  --fg-muted: rgba(20, 20, 20, 0.68);
+}
+
 @layer base {
   html {
     background: var(--page);

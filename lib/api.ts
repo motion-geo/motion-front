@@ -188,6 +188,34 @@ export async function apiCancelMyPlan(
   return res.json() as Promise<{ planId: string }>;
 }
 
+export type ApiContactMessage = {
+  id: string;
+  name: string;
+  company: string;
+  phone: string;
+  email: string;
+  message: string;
+  isRead: boolean;
+  isFavorite: boolean;
+  createdAt: string;
+};
+
+export async function apiSubmitContactMessage(input: {
+  name: string;
+  company: string;
+  phone: string;
+  email: string;
+  message: string;
+}): Promise<ApiContactMessage> {
+  const res = await fetch(`${API_URL}/messages`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  if (!res.ok) await parseError(res);
+  return res.json() as Promise<ApiContactMessage>;
+}
+
 export type ApiPartner = {
   id: string;
   slug: string;

@@ -153,6 +153,7 @@ export type Dictionary = {
     email: string;
     message: string;
     submit: string;
+    sending: string;
     successTitle: string;
     successBody: string;
     again: string;

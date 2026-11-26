@@ -1,12 +1,15 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { apiSubmitContactMessage } from "@/lib/api";
 import { useLocale, usePageTitle } from "./locale";
 import { SectionLabel } from "./section-label";
 import { useSettings } from "./use-settings";
 
 type Errors = {
   name?: string;
+  company?: string;
+  phone?: string;
   email?: string;
   message?: string;
 };
@@ -17,25 +20,46 @@ export function ContactPage() {
   usePageTitle(`${t.nav.contact} · Motion`);
   const [sent, setSent] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   const hasContactInfo = Boolean(
     settings.phone || settings.email || settings.address,
   );
 
-  function onSubmit(event: FormEvent<HTMLFormElement>) {
+  async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
+    const form = event.currentTarget;
+    const data = new FormData(form);
     const name = String(data.get("name") ?? "").trim();
+    const company = String(data.get("company") ?? "").trim();
+    const phone = String(data.get("phone") ?? "").trim();
     const email = String(data.get("email") ?? "").trim();
     const message = String(data.get("message") ?? "").trim();
+
     const next: Errors = {};
     if (!name) next.name = t.contact.required;
-    if (!message) next.message = t.contact.required;
-    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!company) next.company = t.contact.required;
+    if (!phone) next.phone = t.contact.required;
+    if (!email) next.email = t.contact.required;
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       next.email = t.contact.emailInvalid;
     }
+    if (!message) next.message = t.contact.required;
     setErrors(next);
-    if (Object.keys(next).length === 0) setSent(true);
+    setSubmitError("");
+    if (Object.keys(next).length > 0) return;
+
+    setSubmitting(true);
+    try {
+      await apiSubmitContactMessage({ name, company, phone, email, message });
+      form.reset();
+      setSent(true);
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : t.auth.formError);
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -117,7 +141,7 @@ export function ContactPage() {
           </div>
         ) : (
           <form
-            onSubmit={onSubmit}
+            onSubmit={(event) => void onSubmit(event)}
             noValidate
             className="min-w-0 rounded-[1.5rem] border border-line bg-soft p-4 sm:rounded-[1.8rem] sm:p-8"
           >
@@ -127,19 +151,29 @@ export function ContactPage() {
                 name="name"
                 error={errors.name}
                 autoComplete="name"
+                required
               />
               <Field
                 label={t.contact.company}
                 name="company"
+                error={errors.company}
                 autoComplete="organization"
+                required
               />
-              <Field label={t.contact.phone} name="phone" autoComplete="tel" />
+              <Field
+                label={t.contact.phone}
+                name="phone"
+                error={errors.phone}
+                autoComplete="tel"
+                required
+              />
               <Field
                 label={t.contact.email}
                 name="email"
                 type="email"
                 error={errors.email}
                 autoComplete="email"
+                required
               />
             </div>
             <label className="mt-5 block">
@@ -149,6 +183,7 @@ export function ContactPage() {
               <textarea
                 name="message"
                 rows={5}
+                required
                 className="mt-2 w-full resize-y rounded-2xl border border-line bg-page px-4 py-3.5 text-base text-page-fg outline-none transition-[border-color,box-shadow] placeholder:text-fg-muted focus:border-accent focus:shadow-[0_0_0_3px_var(--soft)]"
               />
               {errors.message ? (
@@ -157,11 +192,21 @@ export function ContactPage() {
                 </span>
               ) : null}
             </label>
+            {submitError ? (
+              <p className="mt-4 text-sm text-motion-red">{submitError}</p>
+            ) : null}
             <button
               type="submit"
-              className="mt-7 inline-flex rounded-full bg-accent px-7 py-3.5 text-sm font-medium text-accent-fg transition-transform hover:scale-[1.02]"
+              disabled={submitting}
+              className="mt-7 inline-flex rounded-full bg-accent px-7 py-3.5 text-sm font-medium text-accent-fg transition-transform hover:scale-[1.02] disabled:opacity-60"
             >
-              {t.contact.submit}
+              {submitting
+                ? locale === "ka"
+                  ? "იგზავნება…"
+                  : "Sending…"
+                : locale === "ka"
+                  ? "გაგზავნა"
+                  : "Send"}
             </button>
           </form>
         )}
@@ -176,12 +221,14 @@ function Field({
   type = "text",
   error,
   autoComplete,
+  required,
 }: {
   label: string;
   name: string;
   type?: string;
   error?: string;
   autoComplete?: string;
+  required?: boolean;
 }) {
   return (
     <label className="block">
@@ -192,6 +239,7 @@ function Field({
         name={name}
         type={type}
         autoComplete={autoComplete}
+        required={required}
         className="mt-2 w-full rounded-2xl border border-line bg-page px-4 py-3.5 text-base text-page-fg outline-none transition-[border-color,box-shadow] focus:border-accent focus:shadow-[0_0_0_3px_var(--soft)]"
       />
       {error ? (

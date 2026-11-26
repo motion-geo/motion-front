@@ -146,7 +146,7 @@ export function HomePage() {
         </div>
       </section>
 
-      <section className="bg-muted text-muted-fg">
+      <section className="bg-panel text-panel-fg">
         <div className="shell py-20 md:py-28">
           <Reveal className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
@@ -270,48 +270,71 @@ export function HomePage() {
 
 function TargetIcon() {
   return (
-    <svg viewBox="0 0 72 72" className="h-16 w-16 shrink-0" aria-hidden="true">
+    <svg
+      viewBox="0 0 72 72"
+      className="h-16 w-16 shrink-0 text-card-fg"
+      aria-hidden="true"
+    >
       <circle
         cx="32"
         cy="36"
         r="18"
         fill="none"
-        stroke="#141414"
-        strokeWidth="2"
+        stroke="currentColor"
+        strokeWidth="2.25"
+        opacity="0.85"
       />
       <circle
         cx="32"
         cy="36"
         r="11"
         fill="none"
-        stroke="#141414"
-        strokeWidth="2"
+        stroke="currentColor"
+        strokeWidth="2.25"
+        opacity="0.85"
       />
-      <circle cx="32" cy="36" r="4.5" fill="#FE725B" />
-      <path d="M44 24 L62 8" stroke="#141414" strokeWidth="2" />
-      <path d="M52 8 H62 V18" fill="none" stroke="#141414" strokeWidth="2" />
+      <circle cx="32" cy="36" r="4.5" fill="var(--accent)" />
+      <path
+        d="M44 24 L62 8"
+        stroke="currentColor"
+        strokeWidth="2.25"
+        opacity="0.85"
+      />
+      <path
+        d="M52 8 H62 V18"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.25"
+        opacity="0.85"
+      />
     </svg>
   );
 }
 
 function BulbIcon() {
   return (
-    <svg viewBox="0 0 72 72" className="h-16 w-16 shrink-0" aria-hidden="true">
+    <svg
+      viewBox="0 0 72 72"
+      className="h-16 w-16 shrink-0 text-card-fg"
+      aria-hidden="true"
+    >
       <path
         d="M36 10c-10 0-18 8-18 18 0 7 4 12 8 15v5h20v-5c4-3 8-8 8-15 0-10-8-18-18-18z"
-        fill="#FE725B"
+        fill="var(--accent)"
       />
       <path
         d="M30 52h12M32 58h8"
-        stroke="#141414"
-        strokeWidth="2"
+        stroke="currentColor"
+        strokeWidth="2.25"
         strokeLinecap="round"
+        opacity="0.85"
       />
       <path
         d="M36 4v4M16 18l3 3M56 18l-3 3M12 34h5M55 34h5"
-        stroke="#141414"
-        strokeWidth="2"
+        stroke="currentColor"
+        strokeWidth="2.25"
         strokeLinecap="round"
+        opacity="0.85"
       />
     </svg>
   );
